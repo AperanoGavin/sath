@@ -1,0 +1,26 @@
+services:
+
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: webapp
+      POSTGRES_PASSWORD: webapp
+      POSTGRES_DB: webapp
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./database:/var/lib/postgresql/data
+
+      
+  web:
+    build: .
+    container_name: webapp
+    ports:
+      - "80:80"
+    volumes:
+      - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+    depends_on:
+      - db
