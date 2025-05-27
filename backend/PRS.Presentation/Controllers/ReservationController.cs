@@ -7,28 +7,40 @@ namespace PRS.Presentation.Controllers;
 [Route("/api/v1/reservations")]
 public class ReservationController() : ControllerBase
 {
-    [HttpGet(Name = "GetReservation")]
+    [HttpGet]
     public IActionResult GetReservations()
     {
-        var mockedReservations = Enumerable.Range(0, 10)
-          .Select(static reservation =>
-              new ReservationDto
-              {
-                  Id = Guid.NewGuid().ToString(),
-                  SpotId = Guid.NewGuid().ToString(),
-                  UserId = Guid.NewGuid().ToString(),
-                  CreatedAt = DateTime.UtcNow,
-                  From = DateTime.UtcNow,
-                  To = DateTime.UtcNow,
-                  Status = reservation % 3 == 0 ? ReservationStatus.Booked : ReservationStatus.Reserved
-              });
+        throw new NotImplementedException();
+    }
 
-        var response = new ApiResponse<IEnumerable<ReservationDto>>
-        {
-            Data = mockedReservations,
-            Meta = new { Timestamp = DateTime.UtcNow }
-        };
+    [HttpPost]
+    public IActionResult CreateReservation([FromBody] CreateReservationRequest request)
+    {
+        throw new NotImplementedException();
+    }
 
-        return Ok(response);
+    [HttpGet("{id}")]
+    public IActionResult GetReservation([FromRoute] string id)
+    {
+        throw new NotImplementedException();
+    }
+
+    [HttpPut("{id}/cancel")]
+    public IActionResult CancelReservation([FromRoute] string id)
+    {
+        throw new NotImplementedException();
+    }
+
+    [HttpPost("{id}/check-in")]
+    public IActionResult CheckInReservation([FromRoute] string id)
+    {
+        throw new NotImplementedException();
+    }
+
+    [HttpGet("history")]
+    public IActionResult GetReservationHistory()
+    {
+        throw new NotImplementedException();
     }
 }
+

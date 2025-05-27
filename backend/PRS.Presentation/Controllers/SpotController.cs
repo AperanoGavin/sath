@@ -5,30 +5,42 @@ namespace PRS.Presentation.Controllers;
 
 [ApiController]
 [Route("/api/v1/spots")]
-public class SpotController() : ControllerBase
+public class SpotController : ControllerBase
 {
-    [HttpGet(Name = "GetSpot")]
+    [HttpGet]
     public IActionResult GetSpots()
     {
-        const int rows = 5;
-        const int spotsPerRow = 10;
+        throw new NotImplementedException();
+    }
 
-        var mockedSpots = Enumerable.Range(0, rows)
-            .SelectMany(row =>
-                Enumerable.Range(1, spotsPerRow).Select(spot => new SpotDto
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Key = $"{(char)('A' + row)}{spot:D2}",
-                    Capabilities = spot % 3 == 0 ? [SpotCapability.ElectricCharger] : []
-                })
-            );
+    [HttpGet("capabilities")]
+    public IActionResult GetSpotCapabilities()
+    {
+        throw new NotImplementedException();
+    }
 
-        var response = new ApiResponse<IEnumerable<SpotDto>>
-        {
-            Data = mockedSpots,
-            Meta = new { Timestamp = DateTime.UtcNow }
-        };
+    [HttpGet("{id}")]
+    public IActionResult GetSpot([FromRoute] string id)
+    {
+        throw new NotImplementedException();
+    }
 
-        return Ok(response);
+    [HttpPost]
+    public IActionResult CreateSpot([FromBody] CreateSpotRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    [HttpDelete("{id}")]
+    public IActionResult RemoveSpot([FromRoute] string id)
+    {
+        throw new NotImplementedException();
+    }
+
+    [HttpGet("{id}/calendar")]
+    public IActionResult GetSpotCalendar([FromRoute] string id)
+    {
+        throw new NotImplementedException();
     }
 }
+
