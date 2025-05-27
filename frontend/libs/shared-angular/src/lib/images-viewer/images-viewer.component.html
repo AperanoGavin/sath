@@ -1,0 +1,50 @@
+<div class="relative w-full aspect-square overflow-hidden">
+    @if (images().length > 0) {
+        <div class="flex transition-transform duration-300 ease-in-out h-full" [style.transform]="'translateX(' + currentImageIndex * -100 + '%)'">
+            @for (item of images(); track item) {
+                <img class="w-full h-full flex-shrink-0 object-cover" [src]="item" alt="">
+            }
+        </div>
+        
+        <div class="absolute top-1/2 -translate-y-1/2 w-full flex justify-between px-4">
+            <button 
+                class="cursor-pointer bg-white/50 hover:bg-white/80 transition-colors p-2 rounded-full"
+                (click)="previousImage()" 
+                (keydown.enter)="previousImage()"
+                (keydown.space)="previousImage()"
+                tabindex="0"
+                [disabled]="currentImageIndex === 0">
+                <mat-icon>chevron_left</mat-icon>
+            </button>
+            <button 
+                class="cursor-pointer bg-white/50 hover:bg-white/80 transition-colors p-2 rounded-full aspect-square"
+                (click)="nextImage()" 
+                (keydown.enter)="nextImage()"
+                (keydown.space)="nextImage()"
+                tabindex="0"
+                [disabled]="currentImageIndex === images.length - 1">
+                <mat-icon>chevron_right</mat-icon>
+            </button>
+        </div>
+
+        @if (images().length > 1) {
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+            @for (image of images(); track image; let i = $index) {
+                <div
+                    class="w-fit h-fit aspect-square rounded-full transition-colors cursor-pointer"
+                    [ngClass]="{
+                        'bg-white/90': currentImageIndex === i,
+                        'hover:bg-white/90': currentImageIndex !== i,
+                        'bg-white/40': currentImageIndex !== i,
+                    }"
+                    (click)="currentImageIndex = i"
+                    >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" fill="transparent" />
+                    </svg>
+                </div>
+            }
+        </div>
+        }
+    }
+</div>

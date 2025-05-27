@@ -1,0 +1,66 @@
+<mat-menu #user="matMenu">
+    <div [ngSwitch]="this.authStore.isAuthenticated()">
+        <div *ngSwitchCase="true">
+            <span class="hidden md:inline">
+                <p class="mx-5 text-center my-2">
+                    {{ username }}
+                </p>
+                <hr>
+            </span>
+            <a [routerLink]="['/editprofile']">
+                <button mat-menu-item>{{ translationKeys.editProfile | translate }}</button>
+            </a>
+            <a [routerLink]="['/profile']">
+                <button mat-menu-item>{{ translationKeys.profile | translate }}</button>
+            </a>
+            <hr>
+            <button (click)="logout()" mat-menu-item>{{ translationKeys.logout | translate }}</button>
+        </div>
+        <div *ngSwitchDefault>
+            <a [routerLink]="['/login']">
+                <button mat-menu-item>{{ translationKeys.login | translate }}</button>
+            </a>
+            <a [routerLink]="['/register']">
+                <button mat-menu-item>{{ translationKeys.register | translate }}</button>
+            </a>
+        </div>
+    </div>
+</mat-menu>
+
+
+<mat-menu #langs="matMenu">
+    <div *ngFor="let lang of languages">
+        <button mat-menu-item (click)="changeLang(lang)">
+            <div class="flex justify-between">
+                <img src="https://flagcdn.com/32x24/{{getFlag(lang)}}.webp" alt="">
+                <span *ngIf="currentLanguage === lang">
+                    <mat-icon>check</mat-icon>
+                </span>
+            </div>
+        </button>
+    </div>
+</mat-menu>
+
+
+<mat-toolbar-row class="flex justify-between bg-primary shadow-xl p-4 text-lg">
+    <div class="flex justify-around gap-4 text-slate-100 items-center">
+        <a [routerLink]="['/']" class="font-semibold">Parking Booking</a>
+        <div class="flex justify-around gap-5 ml-7">
+            <a [routerLink]="['/parkings']" href="#" class="hover:text-accent duration-100">Parkings</a>
+            <!-- <a [routerLink]="['/catalog']" href="#" class="hover:text-accent duration-100">{{ translationKeys.catalog | translate }}</a> -->
+        </div>
+    </div>
+    <div class="flex justify-between gap-4 text-slate-100 items-center">
+        <div class="relative flex items-baseline">
+            <mat-icon class="h-full w-full hover:text-accent duration-100 cursor-pointer" *ngIf="this.authStore.isAuthenticated()">mail</mat-icon>
+            <!-- <mat-icon class="h-full w-full hover:text-accent duration-100 cursor-pointer" (click)="messageStore.tchatVisible() ? messageStore.hideTchat() : messageStore.showTchat()" *ngIf="this.authStore.isAuthenticated()">mail</mat-icon> -->
+            <!-- @if (messageStore.conversationsWithNewMessages().size) {
+                <svg class="absolute -top-1 -right-1" fill="deepskyblue" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12"/></svg>
+            } -->
+        </div>
+        <!-- <mat-icon *ngIf="authStore.isAuthenticated()" [routerLink]="['/groups']" class="hover:text-accent duration-100 cursor-pointer">group</mat-icon> -->
+        <mat-icon class="hover:text-accent duration-100 cursor-pointer">dark_mode</mat-icon>
+        <mat-icon class="hover:text-accent duration-100 cursor-pointer" [matMenuTriggerFor]="user">account_circle</mat-icon>
+        <mat-icon class="hover:text-accent duration-100 cursor-pointer" [matMenuTriggerFor]="langs">language</mat-icon>
+    </div>
+</mat-toolbar-row>

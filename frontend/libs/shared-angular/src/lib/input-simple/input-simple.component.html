@@ -1,0 +1,9 @@
+<mat-form-field class="w-full">
+  <mat-label>{{label()}}</mat-label>
+  <input
+  [required]="required()"
+  [placeholder]="placeholder()"
+  [type]="type()"
+  [formControl]="_formControl()"
+  matInput>
+</mat-form-field>

@@ -1,0 +1,46 @@
+<div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-3">
+        <h3 class="text-2xl">Commentaires</h3>
+        <lib-input-textarea placeholder="Ajouter un commentaire" label="Ajouter un commentaire" [required]="false" [control]="commentControl" ></lib-input-textarea>
+        <lib-button class="w-3/12" (out)="submitComment()" text="Poster" [disabled]="commentControl.invalid"></lib-button>
+    </div>
+    
+    <hr>
+    
+    <div class="flex flex-col gap-3 max-h-64 overflow-auto">
+        @for (comment of comments(); track $index) {
+            @defer (on viewport) {
+            <div class="flex gap-3">
+                <img src="https://avatar.iran.liara.run/public" alt="Avatar" class="w-12 h-12 rounded-full">
+                <div class="flex flex-col">
+                    <div class="flex gap-3 items-center text-sm">
+                        <span class="font-bold hover:underline text-primary-black underline-offset-2 hover:text-accent duration-100 cursor-pointer">Unknown</span>
+                        <span class="flex gap-1 items-center">
+                            <span class="text-gray-600">{{comment.created_at | date}}</span>
+                            <span class="text-sm">{{comment.likes.length}}</span>
+                            @if (isLiked(comment.likes)) {
+                                <mat-icon (click)="unlike(comment.id)" class="text-primary hover:text-accent duration-100 cursor-pointer text-base">star</mat-icon>
+                            } @else {
+                                <mat-icon (click)="like(comment.id)" class="text-primary-black hover:text-accent duration-100 cursor-pointer text-base">star</mat-icon>
+                            }
+                        </span>
+                    </div>
+                    <p class="text-sm">{{comment.content}}</p>
+                    <div class="flex gap-1 mt-2 items-center">
+                        <p class="text-gray-600 text-xs">{{comment.created_at | timeAgo}}</p>
+                        <p class="text-xs cursor-pointer text-primary-black hover:underline transition-all duration-150 ease-in-out">Reply</p>
+                        <p (click)=deleteComment(comment.id) class="text-xs cursor-pointer text-primary-black hover:underline transition-all duration-150 ease-in-out">Delete</p>
+                        <div class="text-gray-600 text-xs flex items-center cursor-pointer text-primary-black hover:underline transition-all duration-150 ease-in-out">
+                            <!-- <p (click)="viewReplies()">View replies (4)</p> -->
+                            <mat-icon>keyboard_arrow_down</mat-icon>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            } @placeholder {
+                <p>Aucun commentaires</p>
+            }
+            <hr>
+        }
+    </div>
+</div>

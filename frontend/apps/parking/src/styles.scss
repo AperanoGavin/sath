@@ -1,0 +1,87 @@
+/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+@use '@angular/material-experimental' as matx;
+@use "./theme-colors" as theme;
+@use 'sass:map';
+
+@use "tailwindcss";
+@use "./_theme-colors.scss";
+
+html {
+    @include mat.theme(
+      (
+        color: theme.$primary-palette,
+        typography: Roboto,
+        density: 0,
+      )
+    );
+}
+
+
+// --mat-sys-background: light-dark(#fbf8ff, #12131c);
+//   --mat-sys-error: light-dark(#c00100, #ffb4a8);
+//   --mat-sys-error-container: light-dark(#ffdad4, #930100);
+//   --mat-sys-inverse-on-surface: light-dark(#f1effd, #2f303a);
+//   --mat-sys-inverse-primary: light-dark(#bdc2ff, #3044f4);
+//   --mat-sys-inverse-surface: light-dark(#2f303a, #e3e1ef);
+//   --mat-sys-on-background: light-dark(#1a1b25, #e3e1ef);
+//   --mat-sys-on-error: light-dark(#ffffff, #690100);
+//   --mat-sys-on-error-container: light-dark(#930100, #ffdad4);
+//   --mat-sys-on-primary: light-dark(#ffffff, #0013a0);
+//   --mat-sys-on-primary-container: light-dark(#001ede, #dfe0ff);
+//   --mat-sys-on-primary-fixed: light-dark(#000865, #000865);
+//   --mat-sys-on-primary-fixed-variant: light-dark(#001ede, #001ede);
+//   --mat-sys-on-secondary: light-dark(#ffffff, #1e2775);
+//   --mat-sys-on-secondary-container: light-dark(#363f8d, #dfe0ff);
+//   --mat-sys-on-secondary-fixed: light-dark(#030b61, #030b61);
+//   --mat-sys-on-secondary-fixed-variant: light-dark(#363f8d, #363f8d);
+//   --mat-sys-on-surface: light-dark(#1a1b25, #e3e1ef);
+//   --mat-sys-on-surface-variant: light-dark(#444556, #e1e1f6);
+//   --mat-sys-on-tertiary: light-dark(#ffffff, #0013a0);
+//   --mat-sys-on-tertiary-container: light-dark(#001ede, #dfe0ff);
+//   --mat-sys-on-tertiary-fixed: light-dark(#000865, #000865);
+//   --mat-sys-on-tertiary-fixed-variant: light-dark(#001ede, #001ede);
+//   --mat-sys-outline: light-dark(#757688, #8f8fa2);
+//   --mat-sys-outline-variant: light-dark(#c5c5d9, #444556);
+//   --mat-sys-primary: light-dark(#3044f4, #bdc2ff);
+//   --mat-sys-primary-container: light-dark(#dfe0ff, #001ede);
+//   --mat-sys-primary-fixed: light-dark(#dfe0ff, #dfe0ff);
+//   --mat-sys-primary-fixed-dim: light-dark(#bdc2ff, #bdc2ff);
+//   --mat-sys-scrim: light-dark(#000000, #000000);
+//   --mat-sys-secondary: light-dark(#4e57a6, #bdc2ff);
+//   --mat-sys-secondary-container: light-dark(#dfe0ff, #363f8d);
+//   --mat-sys-secondary-fixed: light-dark(#dfe0ff, #dfe0ff);
+//   --mat-sys-secondary-fixed-dim: light-dark(#bdc2ff, #bdc2ff);
+//   --mat-sys-shadow: light-dark(#000000, #000000);
+//   --mat-sys-surface: light-dark(#fbf8ff, #12131c);
+//   --mat-sys-surface-bright: light-dark(#fbf8ff, #383843);
+//   --mat-sys-surface-container: light-dark(#eeecfa, #1e1f29);
+//   --mat-sys-surface-container-high: light-dark(#e8e7f5, #292933);
+//   --mat-sys-surface-container-highest: light-dark(#e3e1ef, #33343f);
+//   --mat-sys-surface-container-low: light-dark(#f4f2ff, #1a1b25);
+//   --mat-sys-surface-container-lowest: light-dark(#ffffff, #0d0d17);
+//   --mat-sys-surface-dim: light-dark(#dad8e6, #12131c);
+//   --mat-sys-surface-tint: light-dark(#3044f4, #bdc2ff);
+//   --mat-sys-surface-variant: light-dark(#e1e1f6, #444556);
+//   --mat-sys-tertiary: light-dark(#3044f4, #bdc2ff);
+//   --mat-sys-tertiary-container: light-dark(#dfe0ff, #001ede);
+//   --mat-sys-tertiary-fixed: light-dark(#dfe0ff, #dfe0ff);
+//   --mat-sys-tertiary-fixed-dim: light-dark(#bdc2ff, #bdc2ff);
+//   --mat-sys-neutral-variant20: #2e2f3f;
+//   --mat-sys-neutral10: #1a1b25;
+
+.text-primary {
+  color: map.get(theme.$primary-palette, 50)
+}
+
+.text-primary:hover {
+  color: map.get(theme.$primary-palette, 40)
+}
+
+.text-primary-black:hover {
+  color: map.get(theme.$primary-palette, 40)
+}
+
+.bg-primary {
+  background-color: map.get(theme.$primary-palette, 50)
+}
