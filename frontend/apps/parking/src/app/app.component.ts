@@ -4,9 +4,10 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { HeaderComponent } from './header/header.component';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthStore } from './stores/auth.store';
+import { ParkingComponent } from './parking/parking.component';
 
 @Component({
-  imports: [RouterModule, HeaderComponent, TranslateModule],
+  imports: [RouterModule, HeaderComponent, TranslateModule, ParkingComponent],
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

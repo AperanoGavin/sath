@@ -1,0 +1,8 @@
+<div class="drop-zone" (dragover)="onDragOver($event)" (dragleave)="onDragOver($event)" (drop)="onDrop($event)"
+    (click)="spotClicked()" (keypress)="spotClicked()">
+    <p class="hover:underline underline-offset-2 hover:text-accent duration-100">Drag and drop car here</p>
+</div>
+
+<!-- <div *ngIf="isDragOver" class="drag-over">
+    <div class="plus pointer-events-none">+</div>
+</div> -->

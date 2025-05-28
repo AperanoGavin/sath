@@ -7,7 +7,7 @@ import { ExampleDTO } from '../dtos';
 @Injectable({
   providedIn: 'root',
 })
-export class ProjectService {
+export class ParkingService {
     private env: Environment = defaultEnv
     
     constructor(
