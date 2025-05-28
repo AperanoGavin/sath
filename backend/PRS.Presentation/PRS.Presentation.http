@@ -1,0 +1,6 @@
+@PRS.Presentation_HostAddress = http://localhost:5095
+
+GET {{PRS.Presentation_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
