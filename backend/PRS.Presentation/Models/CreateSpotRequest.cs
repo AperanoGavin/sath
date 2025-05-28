@@ -1,3 +1,5 @@
+using PRS.Domain.Enums;
+
 namespace PRS.Presentation.Models;
 
 public record CreateSpotRequest
