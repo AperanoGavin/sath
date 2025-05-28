@@ -1,0 +1,14 @@
+
+services:
+  angular-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - '4200:4200'
+    volumes:
+      - ./:/app
+      - /app/node_modules 
+    environment:
+      - STYLE=css
