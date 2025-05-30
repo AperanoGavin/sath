@@ -13,6 +13,7 @@ import { TranslationKeys } from '../keys.interface';
 import { AuthStore } from '../stores/auth.store';
 import { ParkingService } from '../services/parking.service';
 import { ParkingSpotComponent } from './spot/parking-spot.component';
+import { ImagesViewerComponent } from '@parking/shared-angular';
 
 @Component({
   selector: 'app-parking-parking',
@@ -27,7 +28,8 @@ import { ParkingSpotComponent } from './spot/parking-spot.component';
     MatButtonModule,
     RouterModule,
     TranslateModule,
-    ParkingSpotComponent
+    ParkingSpotComponent,
+    ImagesViewerComponent
   ],
   templateUrl: './parking.component.html',
 })
@@ -49,6 +51,7 @@ export class ParkingComponent implements OnInit {
 
   firstLineSpots: number[] = [];
   secondLineSpots: number[] = [];
+  cars = ['/assets/voiture1.png', '/assets/voiture2.png', '/assets/voiture3.png', '/assets/voiture4.png', '/assets/voiture5.png'];
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {

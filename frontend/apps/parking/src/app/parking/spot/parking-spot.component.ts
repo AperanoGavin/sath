@@ -12,6 +12,7 @@ import { TranslationKeys } from '../../keys.interface';
 import { AuthStore } from '../../stores/auth.store';
 import { ParkingService } from '../../services/parking.service';
 import { AlertService } from '../../services/alert.service';
+import { ParkingStore } from '../../stores/parking.store';
 
 @Component({
   selector: 'app-parking-parking-spot',
@@ -39,7 +40,7 @@ export class ParkingSpotComponent implements OnInit {
     @Inject(PLATFORM_ID) private platformId: object
   ) {}
 
-  readonly authStore = inject(AuthStore);
+  readonly parkingStore = inject(ParkingStore);
 
   translationKeys = TranslationKeys
 
@@ -61,15 +62,18 @@ export class ParkingSpotComponent implements OnInit {
   onDrop(event: DragEvent) {
     event.preventDefault();
     this.isDragOver = false;
-    console.log(event)
-    console.log(event.dataTransfer)
     if (this.car() !== null) {
-      this.alertService.error('This parking spot is already occupied!', 'error');
+      this.alertService.error('Emplacement déja utilisé', 'error');
       return;
     }
 
+    const html = event.dataTransfer?.getData('text/html') || '';
+    const parsedDocument = new DOMParser().parseFromString(html, "text/html");
+    const imgElement = parsedDocument.querySelector('img');
+    const image = imgElement ? imgElement.src : '';
+
     if (confirm('Voulez vous déposer la voiture ici ?')) {
-      this.car.set("/assets/voiture1.png");
+      this.car.set(image);
     }
   }
 
@@ -80,6 +84,6 @@ export class ParkingSpotComponent implements OnInit {
   }
 
   spotClicked() {
-    this.alertService.info('Parking spot clicked!', 'info');
+    // 
   }
 }
