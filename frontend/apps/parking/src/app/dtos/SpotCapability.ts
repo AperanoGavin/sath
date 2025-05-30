@@ -1,0 +1,4 @@
+export enum SpotCapability
+{
+    ElectricCharger
+}
