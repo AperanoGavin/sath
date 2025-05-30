@@ -1,5 +1,5 @@
 import { LoginUseCase } from './LoginUseCase';
-import { IAuthService } from '@auth/domain';
+import { IAuthService } from '../domain/IAuthService';
 
 describe('LoginUseCase', () => {
   it('devrait appeler authService.login()', () => {

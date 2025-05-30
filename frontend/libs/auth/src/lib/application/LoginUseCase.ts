@@ -1,4 +1,4 @@
-import { IAuthService } from '@auth/domain';
+import { IAuthService } from '../domain/IAuthService';
 
 export class LoginUseCase {
   constructor(private authService: IAuthService) {}
