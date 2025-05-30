@@ -10,23 +10,30 @@ using PRS.Domain.Repositories;
 
 namespace PRS.Application.Handlers;
 
-public class CreateSpotHandler(ISpotFactory factory, IUnitOfWork uow)
+public class CreateSpotHandler(
+    ISpotFactory factory,
+    ISpotRepository repo,
+    IUnitOfWork uow)
         : IRequestHandler<CreateSpotCommand, Result<SpotDto>>
 {
     private readonly ISpotFactory _factory = factory;
+    private readonly ISpotRepository _repo = repo;
     private readonly IUnitOfWork _uow = uow;
 
     public async Task<Result<SpotDto>> Handle(
         CreateSpotCommand request,
         CancellationToken cancellationToken)
     {
-        var res = await _factory.Create(request.Key, [.. request.Capabilities]);
-        if (res.IsFailure)
+
+        var creation = await _factory.Create(request.Key, [.. request.Capabilities]);
+        if (creation.IsFailure)
         {
-            throw new DomainErrorException((DomainError)res.Error!);
+            throw new DomainErrorException((DomainError)creation.Error!);
         }
 
-        var spot = res.Value;
+        var spot = creation.Value;
+
+        await _repo.AddAsync(spot, cancellationToken);
         await _uow.SaveAsync(cancellationToken);
 
         var dto = new SpotDto
@@ -39,3 +46,4 @@ public class CreateSpotHandler(ISpotFactory factory, IUnitOfWork uow)
         return Result<SpotDto>.Success(dto);
     }
 }
+
