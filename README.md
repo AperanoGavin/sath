@@ -24,7 +24,7 @@
    cd frontend
    docker-compose up -d
    ```
-3. Accédez à l'application via votre navigateur à l'adresse suivante : [http://localhost:3000](http://localhost:3000)
+3. Accédez à l'application via votre navigateur à l'adresse suivante : [http://localhost:4200](http://localhost:4200)
 
 
 
