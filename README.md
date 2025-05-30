@@ -1,3 +1,33 @@
+# 🚀 Get Started with SATH
+
+## 📦 Prérequis
+
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
+
+## ▶️ Start
+
+1. Clonez le dépôt :
+
+   ```bash
+   git clone https://github.com/AperanoGavin/sath.git
+   cd sath
+   ```
+2. a-Lancez le backend:
+
+   ```bash
+   docker-compose up -d
+   ```
+   b- Lancez le frontend:
+
+   ```bash
+   cd frontend
+   docker-compose up -d
+   ```
+3. Accédez à l'application via votre navigateur à l'adresse suivante : [http://localhost:3000](http://localhost:3000)
+
+
+
 # Parking Reservation system
 
 ## Context
@@ -69,3 +99,5 @@ It is expected that your app runs in containers, not only to simplify testing an
 It is also expected that your app has tests. Real tests that actually mean something. Please do not create a test project with an assert(true).isTrue() inside just to say you have tests...
 
 ## Have fun!
+
+
