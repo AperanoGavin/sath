@@ -11,6 +11,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpClient, provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
 import { AuthStore } from './stores/auth.store';
 import { provideNativeDateAdapter } from '@angular/material/core';
+import { COGNITO_AUTH_PROVIDER } from '@auth/infrastructure/CognitoAuthService';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -37,6 +38,7 @@ export const appConfig: ApplicationConfig = {
         },
         defaultLanguage: 'en',
       }),
-    )
+    ),
+    ...COGNITO_AUTH_PROVIDER,
   ],
 };
