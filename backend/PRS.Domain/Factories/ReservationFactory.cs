@@ -9,7 +9,8 @@ namespace PRS.Domain.Factories;
 public class ReservationFactory(
     ISpotRepository spotRepo,
     IUserReadOnlyRepository userRepo,
-    IReservationOverlapSpec overlapSpec) : IReservationFactory
+    IReservationOverlapSpec overlapSpec
+) : IReservationFactory
 {
     private readonly ISpotRepository _spotRepo = spotRepo;
     private readonly IUserReadOnlyRepository _userRepo = userRepo;
@@ -20,12 +21,13 @@ public class ReservationFactory(
         Guid userId,
         DateTime from,
         DateTime to,
+        bool needsCharger = false,
         CancellationToken cancellationToken = default)
     {
         var spot = await _spotRepo.GetAsync(spotId, cancellationToken);
         if (spot is null)
         {
-            return Result<Reservation>.Failure(new SpotNotFoundError(spotId));
+            return Result<Reservation>.Failure(new ReservationNotFoundError(spotId));
         }
 
         var user = await _userRepo.GetAsync(userId, cancellationToken);
@@ -34,20 +36,20 @@ public class ReservationFactory(
             return Result<Reservation>.Failure(new UserNotFoundError(userId));
         }
 
-        var creationResult = Reservation.Create(spot, user, from, to);
-        if (creationResult.IsFailure)
+
+        var reserveResult = await spot.ReserveAsync(
+            user,
+            from,
+            to,
+            _overlapSpec,
+            needsCharger,
+            cancellationToken);
+
+        if (reserveResult.IsFailure)
         {
-            return creationResult;
+            return reserveResult;
         }
 
-        var reservation = creationResult.Value;
-
-        var isAllowed = await _overlapSpec.IsSatisfiedBy(spot, from, to, cancellationToken);
-        if (!isAllowed)
-        {
-            return Result<Reservation>.Failure(new ReservationOverlapError(spot.Key, from, to));
-        }
-
-        return Result<Reservation>.Success(reservation);
+        return reserveResult;
     }
 }

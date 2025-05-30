@@ -11,8 +11,8 @@ namespace PRS.Application.Handlers;
 public class CreateReservationHandler(
     IReservationFactory factory,
     IReservationRepository repo,
-    IUnitOfWork uow)
-        : IRequestHandler<CreateReservationCommand, Result<ReservationDto>>
+    IUnitOfWork uow
+) : IRequestHandler<CreateReservationCommand, Result<ReservationDto>>
 {
     private readonly IReservationFactory _factory = factory;
     private readonly IReservationRepository _repo = repo;
@@ -22,17 +22,24 @@ public class CreateReservationHandler(
         CreateReservationCommand request,
         CancellationToken cancellationToken)
     {
+
         var r = await _factory.Create(
-            request.SpotId, request.UserId, request.From, request.To, cancellationToken);
+            request.SpotId,
+            request.UserId,
+            request.From,
+            request.To,
+            request.NeedsCharger,
+            cancellationToken);
 
         if (r.IsFailure)
-        {
-            return Result<ReservationDto>.Failure(r.Error);
-        }
+            return Result<ReservationDto>.Failure(r.Error!);
 
         var reservation = r.Value;
+
+
         await _repo.AddAsync(reservation, cancellationToken);
         await _uow.SaveAsync(cancellationToken);
+
 
         return Result<ReservationDto>.Success(new ReservationDto
         {
