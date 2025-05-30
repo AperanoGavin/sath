@@ -141,7 +141,7 @@ namespace PRS.Domain.Tests.Entities
                 overlapSpec: spec);
 
             result.IsFailure.Should().BeTrue();
-            result.Error!.Code.Should().Be("Reservation.ChargerRequired");
+            result.Error!.Code.Should().Be("Reservation.ElectricChargerRequired");
         }
 
         [Fact]
