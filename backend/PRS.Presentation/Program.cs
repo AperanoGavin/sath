@@ -4,6 +4,17 @@ using PRS.Presentation.Middlewares;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddCors(static options =>
+{
+    options.AddDefaultPolicy(static policy =>
+    {
+        // TODO: Make this configurable
+        policy
+          .WithOrigins("*")
+          .AllowAnyHeader()
+          .AllowAnyMethod();
+    });
+});
 
 builder.Services.AddControllers()
     .AddJsonOptions(static options =>
@@ -18,6 +29,8 @@ builder.Services.AddApplication()
                 .AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseCors();
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
