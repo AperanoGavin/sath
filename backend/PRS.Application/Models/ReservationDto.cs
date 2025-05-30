@@ -1,6 +1,6 @@
 using PRS.Domain.Enums;
 
-namespace PRS.Presentation.Models;
+namespace PRS.Application.Models;
 
 public record ReservationDto
 {

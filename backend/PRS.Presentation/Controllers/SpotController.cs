@@ -1,16 +1,33 @@
+using MediatR;
+
 using Microsoft.AspNetCore.Mvc;
+
+using PRS.Application.Models;
+using PRS.Application.Queries;
 using PRS.Presentation.Models;
 
 namespace PRS.Presentation.Controllers;
 
 [ApiController]
 [Route("/api/v1/spots")]
-public class SpotController : ControllerBase
+public class SpotController(ISender sender) : ControllerBase
 {
+    private readonly ISender _sender = sender;
+
     [HttpGet]
-    public IActionResult GetSpots()
+    public async Task<IActionResult> GetSpots(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var result = await _sender.Send(new GetAllSpotsQuery(), cancellationToken);
+        if (result.IsFailure)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, result.Error);
+        }
+
+        var response = new ApiResponse<IReadOnlyCollection<SpotDto>>()
+        {
+            Data = [.. result.Value]
+        };
+        return Ok(response);
     }
 
     [HttpGet("capabilities")]
@@ -43,4 +60,3 @@ public class SpotController : ControllerBase
         throw new NotImplementedException();
     }
 }
-
