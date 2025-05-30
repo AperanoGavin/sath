@@ -10,7 +10,9 @@ public partial class User
     public string Email { get; private set; }
     public UserRole Role { get; private set; }
 
-    private User(Guid id, string name, string email, UserRole role)
+    private User() { }
+
+    internal User(Guid id, string name, string email, UserRole role)
     {
         Id = id;
         Name = name;

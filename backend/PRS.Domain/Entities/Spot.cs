@@ -16,15 +16,17 @@ namespace PRS.Domain.Entities
 
         public IReadOnlyCollection<Reservation> Reservations => _reservations.AsReadOnly();
 
-        private Spot(Guid id,
+        private Spot() { }
+
+        internal Spot(Guid id,
                      string key,
                      IEnumerable<SpotCapability>? caps = null,
                      IEnumerable<Reservation>? reservations = null)
         {
             Id = id;
             Key = key;
-            _caps = caps?.ToList() ?? new List<SpotCapability>();
-            _reservations = reservations?.ToList() ?? new List<Reservation>();
+            _caps = caps?.ToList() ?? [];
+            _reservations = reservations?.ToList() ?? [];
         }
 
         public static Result<Spot> Create(string key)
