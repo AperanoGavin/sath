@@ -3,52 +3,65 @@ import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { AUTH_SERVICE, IAuthService, UserInfo } from '../domain/IAuthService';
-import { defaultEnv, envStateKey, Environment } from '../../../../../apps/parking/src/app/env';
+
+import { cognitoEnv } from './cognito.env';
 
 @Injectable()
 export class CognitoAuthService implements IAuthService {
-  private env: Environment = defaultEnv;
+  // On reprend directement les valeurs de cognitoEnv
+  private readonly domain   = cognitoEnv.domain;
+  private readonly clientId = cognitoEnv.clientId;
 
   constructor(
     private http: HttpClient,
     @Inject(PLATFORM_ID) private platformId: object
   ) {}
 
-  private get redirectUri() {
+  /** URI de callback telle que configurée dans cognitoEnv */
+  private get redirectUri(): string {
     return isPlatformBrowser(this.platformId)
-      ? this.env.redirectUri
+      ? cognitoEnv.redirectUri
+      : '';
+  }
+
+  /** URI de déconnexion telle que configurée dans cognitoEnv */
+  private get logoutUri(): string {
+    return isPlatformBrowser(this.platformId)
+      ? cognitoEnv.logoutUri
       : '';
   }
 
   login(): void {
     if (!isPlatformBrowser(this.platformId)) return;
-    const { cognitoDomain, clientId } = this.env;
+
     const params = new URLSearchParams({
-      client_id: clientId,
+      client_id:     this.clientId,
       response_type: 'code',
-      scope: 'openid profile email',
-      redirect_uri: this.redirectUri,
+      scope:         'openid profile email',
+      redirect_uri:  this.redirectUri,
     });
-    window.location.href = `${cognitoDomain}/login?${params.toString()}`;
+
+    window.location.href = `${this.domain}/login?${params.toString()}`;
   }
 
   async handleCallback(callbackUrl: string): Promise<UserInfo> {
     if (!isPlatformBrowser(this.platformId)) {
-      throw new Error('SSR: handleCallback interdit');
+      throw new Error('handleCallback uniquement en navigateur');
     }
+
     const url = new URL(callbackUrl);
     const code = url.searchParams.get('code');
     if (!code) throw new Error('OAuth2 code manquant');
 
-    const tokenEndpoint = `${this.env.cognitoDomain}/oauth2/token`;
-    const body = new HttpParams()
+    const tokenEndpoint = `${this.domain}/oauth2/token`;
+    const bodyParams = new HttpParams()
       .set('grant_type', 'authorization_code')
-      .set('client_id', this.env.clientId)
+      .set('client_id', this.clientId)
       .set('redirect_uri', this.redirectUri)
       .set('code', code);
 
     const res = await this.http
-      .post<{ id_token: string }>(tokenEndpoint, body.toString(), {
+      .post<{ id_token: string }>(tokenEndpoint, bodyParams.toString(), {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       })
       .toPromise();
@@ -59,26 +72,33 @@ export class CognitoAuthService implements IAuthService {
     const payload = JSON.parse(atob(idToken.split('.')[1]));
     return {
       username: payload['cognito:username'],
-      email: payload.email,
+      email:    payload.email,
     };
   }
 
   logout(): void {
     if (!isPlatformBrowser(this.platformId)) return;
+
     const params = new URLSearchParams({
-      client_id: this.env.clientId,
-      logout_uri: window.location.origin,
+      client_id:  this.clientId,
+      logout_uri: this.logoutUri,
     });
-    window.location.href = `${this.env.cognitoDomain}/logout?${params.toString()}`;
+
+    window.location.href = `${this.domain}/logout?${params.toString()}`;
   }
 
   async getCurrentUser(): Promise<UserInfo | null> {
     if (!isPlatformBrowser(this.platformId)) return null;
+
     const idToken = localStorage.getItem('id_token');
     if (!idToken) return null;
+
     try {
       const payload = JSON.parse(atob(idToken.split('.')[1]));
-      return { username: payload['cognito:username'], email: payload.email };
+      return {
+        username: payload['cognito:username'],
+        email:    payload.email,
+      };
     } catch {
       return null;
     }

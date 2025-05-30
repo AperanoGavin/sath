@@ -10,8 +10,8 @@ export const cognitoEnv: CognitoEnv = {
   domain: 'https://czfshuw1u.auth.eu-west-1.amazoncognito.com',
   clientId: '622o4sqg2h9e4t4gu47fap5vi0',
 
-  // doit être dans "Allowed callback URLs"
-  redirectUri: 'https://d84l1y8p4kdic.cloudfront.net',
+
+  redirectUri: 'http://d84l1y8p4kdic.cloudfront.net',
 
   // doit être dans "Allowed sign-out URLs"
   logoutUri: 'https://d84l1y8p4kdic.cloudfront.net/logout-callback',
