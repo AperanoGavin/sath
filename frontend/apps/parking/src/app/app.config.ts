@@ -11,6 +11,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpClient, provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
 import { AuthStore } from './stores/auth.store';
 import { provideNativeDateAdapter } from '@angular/material/core';
+import { ParkingStore } from './stores/parking.store';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -20,6 +21,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideStore(),
     AuthStore,
+    ParkingStore,
     provideNativeDateAdapter(),
     provideClientHydration(withEventReplay()),
     provideZoneChangeDetection({ eventCoalescing: true }),

@@ -1,0 +1,8 @@
+<div class="flex drop-zone h-40 w-40" (dragover)="onDragOver($event)" (dragleave)="onDragOver($event)" (drop)="onDrop($event)"
+    (click)="spotClicked()" (keypress)="spotClicked()">
+    @if (car()) {
+        <img draggable="false" class="mx-auto" alt="user car" [src]="car()">
+    } @else {
+        <p class="hover:underline text-primary-black underline-offset-2 hover:text-accent duration-100 h-full w-full">Place n°{{spotNumber()}}</p>
+    }
+</div>
