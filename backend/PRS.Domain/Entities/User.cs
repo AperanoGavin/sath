@@ -25,20 +25,17 @@ public partial class User
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            return Result<User>.Failure(new DomainError(
-                        "User.InvalidName", "Name required", "User name cannot be empty."));
+            return Result<User>.Failure(new UserNameRequiredError());
         }
 
         if (string.IsNullOrWhiteSpace(email))
         {
-            return Result<User>.Failure(new DomainError(
-                        "User.InvalidEmail", "Email required", "User email cannot be empty."));
+            return Result<User>.Failure(new UserEmailRequiredError());
         }
 
         if (role is null)
         {
-            return Result<User>.Failure(new DomainError(
-                        "User.MissingRole", "Role required", "User must have a role."));
+            return Result<User>.Failure(new UserRoleRequiredError());
         }
 
         return Result<User>.Success(new User(Guid.NewGuid(), name, email, role));

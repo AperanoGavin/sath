@@ -23,9 +23,7 @@ public class SpotFactory(ISpotKeyUniquenessSpec spec) : ISpotFactory
         if (!await _uniquenessSpec.IsSatisfiedBy(key))
         {
             return Result<Spot>.Failure(
-                    new DomainError("Spot.DuplicateKey",
-                        "Key already exists",
-                        $"Spot with key '{key}' already exists."));
+                    new SpotDuplicateKeyError(key));
         }
 
         foreach (var cap in capabilities)

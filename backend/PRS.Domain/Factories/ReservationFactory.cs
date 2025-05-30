@@ -25,19 +25,13 @@ public class ReservationFactory(
         var spot = await _spotRepo.GetAsync(spotId, cancellationToken);
         if (spot is null)
         {
-            return Result<Reservation>.Failure(new DomainError(
-                "Reservation.SpotNotFound",
-                "Spot not found",
-                $"No parking spot with id '{spotId}'"));
+            return Result<Reservation>.Failure(new SpotNotFoundError(spotId));
         }
 
         var user = await _userRepo.GetAsync(userId, cancellationToken);
         if (user is null)
         {
-            return Result<Reservation>.Failure(new DomainError(
-                "Reservation.UserNotFound",
-                "User not found",
-                $"No user with id '{userId}'"));
+            return Result<Reservation>.Failure(new UserNotFoundError(userId));
         }
 
         var creationResult = Reservation.Create(spot, user, from, to);
@@ -51,10 +45,7 @@ public class ReservationFactory(
         var isAllowed = await _overlapSpec.IsSatisfiedBy(spot, from, to, cancellationToken);
         if (!isAllowed)
         {
-            return Result<Reservation>.Failure(new DomainError(
-                "Reservation.Overlap",
-                "Time slot unavailable",
-                $"Spot '{spot.Key}' is already reserved during {from:yyyy-MM-dd} → {to:yyyy-MM-dd}."));
+            return Result<Reservation>.Failure(new ReservationOverlapError(spot.Key, from, to));
         }
 
         return Result<Reservation>.Success(reservation);

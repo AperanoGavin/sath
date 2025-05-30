@@ -1,8 +1,5 @@
-using MediatR;
-
 using Microsoft.Extensions.DependencyInjection;
 
-using PRS.Application.Behaviors;
 using PRS.Domain.Factories;
 using PRS.Infrastructure;
 
@@ -23,10 +20,6 @@ public static class ServiceCollectionExtensions
             .AddInfrastructure();
 
         services.AddMediatR(static cfg => cfg.RegisterServicesFromAssembly(typeof(ServiceCollectionExtensions).Assembly));
-
-        services.AddTransient(
-            typeof(IPipelineBehavior<,>),
-            typeof(ExceptionToResultBehavior<,>));
 
         return services;
     }

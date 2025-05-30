@@ -35,8 +35,7 @@ namespace PRS.Domain.Entities
         {
             if (to <= from)
             {
-                return Result<Reservation>.Failure(new DomainError(
-                            "Reservation.InvalidPeriod", "Bad dates", "'To' must come after 'From'."));
+                return Result<Reservation>.Failure(new ReservationInvalidPeriodError());
             }
 
             if (user.Role.Key == "Manager")
@@ -44,9 +43,7 @@ namespace PRS.Domain.Entities
                 var span = (to - from).TotalDays;
                 if (span > 30)
                 {
-                    return Result<Reservation>.Failure(new DomainError(
-                                "Reservation.TooLong", "Period too long",
-                                "Managers can book at most 30 days."));
+                    return Result<Reservation>.Failure(new ReservationTooLongError("Managers can book at most 30 days."));
                 }
             }
             else
@@ -54,9 +51,7 @@ namespace PRS.Domain.Entities
                 int workingDays = CountWorkingDays(from, to);
                 if (workingDays > 5)
                 {
-                    return Result<Reservation>.Failure(new DomainError(
-                                "Reservation.TooLong", "Period too long",
-                                "Max reservation length is 5 working days."));
+                    return Result<Reservation>.Failure(new ReservationTooLongError("Max reservation length is 5 working days for employees."));
                 }
             }
 
@@ -83,15 +78,9 @@ namespace PRS.Domain.Entities
             switch (Status)
             {
                 case ReservationStatus.Cancelled or ReservationStatus.Expired:
-                    return Result.Failure(new DomainError(
-                                    "Reservation.AlreadyCancelled",
-                                    "Cannot cancel",
-                                    "Reservation is already cancelled or expired."));
+                    return Result.Failure(new ReservationAlreadyCancelledError());
                 case ReservationStatus.CheckedIn:
-                    return Result.Failure(new DomainError(
-                                    "Reservation.InvalidState",
-                                    "Cannot cancel",
-                                    "Reservation is already checked-in."));
+                    return Result.Failure(new ReservationInvalidStateError("Reservation is already checked-in."));
             }
 
             Status = ReservationStatus.Cancelled;
@@ -102,19 +91,13 @@ namespace PRS.Domain.Entities
         {
             if (Status != ReservationStatus.Reserved)
             {
-                return Result.Failure(new DomainError(
-                    "Reservation.InvalidState",
-                    "Cannot check-in",
-                    "Only a ‘Reserved’ booking can be checked-in."));
+                return Result.Failure(new ReservationInvalidStateError("Only a ‘Reserved’ booking can be checked-in."));
             }
 
 
             if (at > From.Date.AddHours(11))
             {
-                return Result.Failure(new DomainError(
-                    "Reservation.TooLate",
-                    "No-show",
-                    "Check-in after 11 AM is forbidden; reservation expired."));
+                return Result.Failure(new ReservationTooLateError());
             }
 
             Status = ReservationStatus.CheckedIn;
@@ -126,10 +109,7 @@ namespace PRS.Domain.Entities
         {
             if (Status != ReservationStatus.Reserved)
             {
-                return Result.Failure(new DomainError(
-                    "Reservation.InvalidState",
-                    "Cannot expire",
-                    "Only a ‘Reserved’ booking can be expired."));
+                return Result.Failure(new ReservationInvalidStateError("Only a ‘Reserved’ booking can be expired."));
             }
 
             Status = ReservationStatus.Expired;
