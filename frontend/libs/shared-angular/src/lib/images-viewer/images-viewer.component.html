@@ -2,7 +2,7 @@
     @if (images().length > 0) {
         <div class="flex transition-transform duration-300 ease-in-out h-full" [style.transform]="'translateX(' + currentImageIndex * -100 + '%)'">
             @for (item of images(); track item) {
-                <img class="w-full h-full flex-shrink-0 object-cover" [src]="item" alt="">
+                <img class="w-full h-full flex-shrink-0 object-contain" [src]="item" alt="">
             }
         </div>
         
