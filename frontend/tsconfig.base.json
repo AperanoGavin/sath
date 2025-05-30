@@ -17,7 +17,9 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "paths": {
-      "@parking/shared-angular": ["libs/shared-angular/src/index.ts"]
+      "@parking/auth": ["auth/src/index.ts"],
+      "@parking/shared-angular": ["libs/shared-angular/src/index.ts"],
+      "@auth/*": ["libs/auth/src/lib/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]
