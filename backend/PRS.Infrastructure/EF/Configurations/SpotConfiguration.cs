@@ -14,6 +14,7 @@ internal class SpotConfiguration : IEntityTypeConfiguration<Spot>
         builder.HasKey(static s => s.Id);
         builder.Property(static s => s.Key).IsRequired();
 
+        builder.HasIndex(static s => s.Key).IsUnique();
 
         var conv = new ValueConverter<List<SpotCapability>, string>(
             static v => string.Join(",", v.Select(static e => e.ToString())),
@@ -23,11 +24,12 @@ internal class SpotConfiguration : IEntityTypeConfiguration<Spot>
         );
         builder.Property<List<SpotCapability>>("_caps")
          .HasConversion(conv);
-        // .HasColumnName("Capabilities");
 
 
-        builder.HasMany<Reservation>("_reservations")
-         .WithOne("Spot")
-         .HasForeignKey("SpotId");
+        builder.HasMany(static s => s.Reservations)
+           .WithOne(static r => r.Spot)
+           .HasForeignKey("SpotId");
+
+
     }
 }
