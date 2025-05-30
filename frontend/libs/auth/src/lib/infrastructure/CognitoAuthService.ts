@@ -37,9 +37,10 @@ export class CognitoAuthService implements IAuthService {
     const params = new URLSearchParams({
       client_id:     this.clientId,
       response_type: 'code',
-      scope:         'openid profile email',
+      scope:         'openid email',
       redirect_uri:  this.redirectUri,
     });
+
 
     window.location.href = `${this.domain}/login?${params.toString()}`;
   }

@@ -6,13 +6,11 @@ export interface CognitoEnv {
 }
 
 export const cognitoEnv: CognitoEnv = {
-  // le sous-domaine exact de ton Hosted UI
-  domain: 'https://czfshuw1u.auth.eu-west-1.amazoncognito.com',
-  clientId: '622o4sqg2h9e4t4gu47fap5vi0',
+  domain:      'https://eu-west-1czfshuw1u.auth.eu-west-1.amazoncognito.com',
 
+  clientId:    '622o4sqg2h9e4t4gu47fap5vi0',
 
-  redirectUri: 'http://d84l1y8p4kdic.cloudfront.net',
+  redirectUri: 'http://localhost:4200/callback',
 
-  // doit être dans "Allowed sign-out URLs"
-  logoutUri: 'https://d84l1y8p4kdic.cloudfront.net/logout-callback',
+  logoutUri:   'https://d84l1y8p4kdic.cloudfront.net/logout-callback',
 };
