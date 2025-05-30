@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, PLATFORM_ID, TransferState, inject } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID, TransferState, inject, input, linkedSignal, signal } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -45,6 +45,9 @@ export class ParkingSpotComponent implements OnInit {
 
   isDragOver = false;
 
+  spotNumber = input.required<number>()
+  car = signal<string | null>(null);
+
   onDragOver(event: DragEvent) {
     event.preventDefault();
     this.isDragOver = true;
@@ -60,6 +63,14 @@ export class ParkingSpotComponent implements OnInit {
     this.isDragOver = false;
     console.log(event)
     console.log(event.dataTransfer)
+    if (this.car() !== null) {
+      this.alertService.error('This parking spot is already occupied!', 'error');
+      return;
+    }
+
+    if (confirm('Voulez vous déposer la voiture ici ?')) {
+      this.car.set("/assets/voiture1.png");
+    }
   }
 
   ngOnInit(): void {
