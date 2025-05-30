@@ -14,7 +14,9 @@ namespace PRS.Domain.Entities
         public DateTime To { get; private set; }
         public ReservationStatus Status { get; private set; }
 
-        private Reservation(Spot spot, User user, DateTime from, DateTime to)
+        private Reservation() { }
+
+        internal Reservation(Spot spot, User user, DateTime from, DateTime to)
         {
             Id = Guid.NewGuid();
             Spot = spot;
