@@ -1,5 +1,7 @@
-import { Injectable } from '@angular/core';
-import { IAuthService, UserInfo, AUTH_SERVICE } from '../domain/IAuthService';
+// libs/auth/src/lib/infrastructure/CognitoAuthService.ts
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { AUTH_SERVICE, IAuthService, UserInfo } from '../domain/IAuthService';
 
 /**
  * Implémentation du service d'authentification via Amazon Cognito
@@ -8,30 +10,42 @@ import { IAuthService, UserInfo, AUTH_SERVICE } from '../domain/IAuthService';
 export class CognitoAuthService implements IAuthService {
   private readonly clientId = '622o4sqg2h9e4t4gu47fap5vi0';
   private readonly domain   = 'eu-west-1czfshuw1u.auth.eu-west-1.amazoncognito.com';
-  private readonly redirectUri = window.location.origin + '/callback';
 
-  login(): void {
-    const authUrl = `https://${this.domain}/login?` +
-      new URLSearchParams({
-        client_id: this.clientId,
-        response_type: 'code',
-        scope: 'openid profile email',
-        redirect_uri: this.redirectUri
-      }).toString();
-    window.location.href = authUrl;
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: object
+  ) {}
+
+  /** URL de callback calculée dynamiquement en navigateur */
+  private get redirectUri(): string {
+    if (isPlatformBrowser(this.platformId)) {
+      return `${window.location.origin}/callback`;
+    }
+    return '';
   }
 
-  /**
-   * Traite le callback : échange code contre tokens puis décode l'id_token
-   * @param callbackUrl URL complète reçue de Cognito
-   */
+  login(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    const params = new URLSearchParams({
+      client_id: this.clientId,
+      response_type: 'code',
+      scope: 'openid profile email',
+      redirect_uri: this.redirectUri
+    });
+
+    window.location.href = `https://${this.domain}/login?${params.toString()}`;
+  }
+
   async handleCallback(callbackUrl: string): Promise<UserInfo> {
+    if (!isPlatformBrowser(this.platformId)) {
+      throw new Error('handleCallback appelé en SSR');
+    }
     const url = new URL(callbackUrl);
     const code = url.searchParams.get('code');
     if (!code) throw new Error('Code OAuth2 manquant');
 
     const tokenEndpoint = `https://${this.domain}/oauth2/token`;
-    const params = new URLSearchParams({
+    const bodyParams = new URLSearchParams({
       grant_type: 'authorization_code',
       client_id: this.clientId,
       code,
@@ -41,32 +55,33 @@ export class CognitoAuthService implements IAuthService {
     const response = await fetch(tokenEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: params.toString()
+      body: bodyParams.toString()
     });
     const { id_token } = await response.json();
-
-    // Décodage basique du JWT (sans vérification) pour récupérer le profil
     const payload = JSON.parse(atob(id_token.split('.')[1]));
+
     return {
       username: payload['cognito:username'],
       email: payload.email,
     };
   }
 
-  /** Déconnecte et redirige vers l’URI de logout Cognito */
   logout(): void {
-    const logoutUrl = `https://${this.domain}/logout?` +
-      new URLSearchParams({
-        client_id: this.clientId,
-        logout_uri: window.location.origin
-      }).toString();
-    window.location.href = logoutUrl;
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    const params = new URLSearchParams({
+      client_id: this.clientId,
+      logout_uri: window.location.origin
+    });
+    window.location.href = `https://${this.domain}/logout?${params.toString()}`;
   }
 
-  /** Récupère l’utilisateur courant depuis un token stocké en localStorage */
   async getCurrentUser(): Promise<UserInfo | null> {
+    if (!isPlatformBrowser(this.platformId)) return null;
+
     const idToken = localStorage.getItem('id_token');
     if (!idToken) return null;
+
     try {
       const payload = JSON.parse(atob(idToken.split('.')[1]));
       return {
@@ -79,9 +94,6 @@ export class CognitoAuthService implements IAuthService {
   }
 }
 
-/**
- * Fourniture de l'implémentation pour l'InjectionToken AUTH_SERVICE
- */
 export const COGNITO_AUTH_PROVIDER = [
   { provide: AUTH_SERVICE, useClass: CognitoAuthService }
 ];

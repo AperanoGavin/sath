@@ -20,17 +20,14 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TranslationKeys } from '../keys.interface';
 import { AuthStore } from '../stores/auth.store';
 
-// On importe l’abstraction IAuthService et son token
 import { AUTH_SERVICE, IAuthService } from '@auth/domain';
-// On importe la vraie classe pour le provider
-import { AuthService } from '../services/auth.service';
+import { COGNITO_AUTH_PROVIDER } from '@auth/infrastructure/CognitoAuthService';
 
 @Component({
   selector: 'app-parking-header',
   standalone: true,
   providers: [
-    AuthService,
-    { provide: AUTH_SERVICE, useExisting: AuthService }
+    ...COGNITO_AUTH_PROVIDER
   ],
   imports: [
     CommonModule,
@@ -47,7 +44,7 @@ import { AuthService } from '../services/auth.service';
 export class HeaderComponent implements OnInit {
   private env: Environment = defaultEnv;
 
-  // on récupère l’implémentation via le token
+  // on récupère l’impl via le token abstrait
   private readonly authService = inject(AUTH_SERVICE) as IAuthService;
   readonly authStore = inject(AuthStore);
   translationKeys = TranslationKeys;
@@ -89,7 +86,6 @@ export class HeaderComponent implements OnInit {
     this.authStore.logout();
   }
 
-  /** déclenche la Hosted UI via ton AuthService concret */
   login(): void {
     this.authService.login();
   }
