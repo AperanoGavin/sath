@@ -69,7 +69,7 @@ public static class ResultToActionResult
 
         var pd = new ProblemDetails
         {
-            Type = $"https://your.api/errors/{err.Code}",
+            Type = $"https://localhost:5095/errors/{err.Code}",
             Title = err.Title,
             Detail = err.Message,
             Status = status
