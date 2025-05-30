@@ -47,10 +47,17 @@ export class ParkingComponent implements OnInit {
 
   isDragOver = false;
 
+  firstLineSpots: number[] = [];
+  secondLineSpots: number[] = [];
+
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
         this.env = this.transferState.get<Environment>(envStateKey, defaultEnv);
     }
+
+    const parkingSpots = Array.from({ length: 16 }, (_, i) => i + 1);
+    this.firstLineSpots = parkingSpots.slice(0, 8);
+    this.secondLineSpots = parkingSpots.slice(8, 16);
   }
 
   parkingSpotClicked() {

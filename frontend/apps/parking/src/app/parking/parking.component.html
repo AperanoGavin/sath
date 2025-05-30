@@ -1,6 +1,29 @@
-bla bla parking
+<div class="flex h-screen w-full">
+    <div class="w-4/24 bg-gray-200 h-full overflow-hidden p-6">
+        <p class="text-lg">Bonjour John Doe !</p>
+        <p>Glisser deposer votre vehicule sur la place de parking désiré pour la reserver</p>
 
-<app-parking-parking-spot></app-parking-parking-spot>
+        <img draggable="true" alt="user car" class="w-5/12 mt-20 mx-auto" src="/assets/flashmcqueen.png">
+    </div>
 
+    <div class="w-px bg-black"></div>
 
-<img class="w-4/12 mt-20" src="/assets/flashmcqueen.png">
+    <div class="p-6 w-20/24 mx-auto ">
+        <h1 class="text-3xl">Parking</h1>
+
+        <div class="flex flex-col items-center mt-5 gap-5">
+            <div class="grid grid-cols-8 grid-rows-1 gap-4 w-3/4">
+                @for (item of firstLineSpots; track $index) {
+                    <app-parking-parking-spot [spotNumber]="item"></app-parking-parking-spot>
+                }
+            </div>
+    
+            <div class="grid grid-cols-8 grid-rows-1 gap-4 w-3/4">
+                @for (item of secondLineSpots; track $index) {
+                    <app-parking-parking-spot [spotNumber]="item"></app-parking-parking-spot>
+                }
+            </div>
+        </div>
+    </div>
+
+</div>
