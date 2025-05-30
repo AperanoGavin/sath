@@ -68,45 +68,41 @@ namespace PRS.Domain.Entities
             return Result.Success();
         }
 
-        public async Task<Result<Reservation>> ReserveAsync(
-            User user,
+        public async Task<Result<Reservation>> ReserveAsync(User user,
             DateTime from,
             DateTime to,
             IReservationOverlapSpec overlapSpec,
+            bool needsCharger = false,
             CancellationToken cancellationToken = default)
         {
+            var today = DateTime.UtcNow.Date;
+            if (from.Date < today)
+                return Result<Reservation>.Failure(new DomainError(
+                    "Reservation.PastFrom", "Start date in the past",
+                    $"Cannot start before {today:yyyy-MM-dd}."));
 
-            var todayUtc = DateTime.UtcNow.Date;
-            if (from.Date < todayUtc)
+            if (needsCharger
+                && !Capabilities.Contains(SpotCapability.ElectricCharger))
             {
                 return Result<Reservation>.Failure(new DomainError(
-                    "Reservation.PastFrom",
-                    "Start date in the past",
-                    $"Cannot start before {todayUtc:yyyy-MM-dd}."));
+                    "Reservation.ChargerRequired", "Charger needed",
+                    $"Spot '{Key}' has no electric charger."));
             }
 
+            var created = Reservation.Create(this, user, from, to);
+            if (created.IsFailure) return created;
 
-            var creation = Reservation.Create(this, user, from, to);
-            if (creation.IsFailure)
-                return creation;
-
-
-            var allowed = await overlapSpec
-                .IsSatisfiedBy(this, from, to, cancellationToken)
-                .ConfigureAwait(false);
-            if (!allowed)
+            if (!await overlapSpec
+                    .IsSatisfiedBy(this, from, to, cancellationToken)
+                    .ConfigureAwait(false))
             {
                 return Result<Reservation>.Failure(new DomainError(
-                    "Reservation.Overlap",
-                    "Time slot unavailable",
-                    $"Spot '{Key}' is already reserved between {from:yyyy-MM-dd} and {to:yyyy-MM-dd}."));
+                    "Reservation.Overlap", "Time slot unavailable",
+                    $"Spot '{Key}' is already reserved {from:yyyy-MM-dd}→{to:yyyy-MM-dd}."));
             }
 
-
-            var reservation = creation.Value;
-            _reservations.Add(reservation);
-
-            return Result<Reservation>.Success(reservation);
+            _reservations.Add(created.Value);
+            return Result<Reservation>.Success(created.Value);
         }
 
         public Result CheckIn(Guid reservationId, DateTime at)

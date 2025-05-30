@@ -126,11 +126,50 @@ namespace PRS.Domain.Tests.Entities
         }
 
         [Fact]
+        public async Task ReserveAsync_ChargerRequiredButNone_Fails()
+        {
+            var spot = Spot.Create("X01").Value;
+            var from = DateTime.UtcNow.Date.AddDays(1);
+            var to = from.AddDays(1);
+            var spec = new FakeOverlapSpec(allowed: true);
+
+            var result = await spot.ReserveAsync(
+                user: _employee,
+                from: from,
+                to: to,
+                needsCharger: true,
+                overlapSpec: spec);
+
+            result.IsFailure.Should().BeTrue();
+            result.Error!.Code.Should().Be("Reservation.ChargerRequired");
+        }
+
+        [Fact]
+        public async Task ReserveAsync_ChargerRequiredAndAvailable_Succeeds()
+        {
+            var spot = Spot.Create("Y01").Value;
+            spot.AddCapability(SpotCapability.ElectricCharger).IsSuccess.Should().BeTrue();
+
+            var from = DateTime.UtcNow.Date.AddDays(1);
+            var to = from.AddDays(1);
+            var spec = new FakeOverlapSpec(allowed: true);
+
+            var result = await spot.ReserveAsync(
+                user: _employee,
+                from: from,
+                to: to,
+                needsCharger: true,
+                overlapSpec: spec);
+
+            result.IsSuccess.Should().BeTrue();
+        }
+
+        [Fact]
         public async Task ReserveAsync_ExceedsMaxDaysEmployee_Fails()
         {
             var spot = Spot.Create("B02").Value;
             var from = DateTime.UtcNow.Date;
-            var to = from.AddDays(6);
+            var to = from.AddDays(8);
             var spec = new FakeOverlapSpec(allowed: true);
 
             var result = await spot.ReserveAsync(_employee, from, to, spec);

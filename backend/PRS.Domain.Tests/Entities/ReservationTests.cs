@@ -17,6 +17,30 @@ public class ReservationTests
     }
 
     [Fact]
+    public void Create_Allows_5_Working_Days_Across_Weekend()
+    {
+        var from = new DateTime(2025, 06, 02);
+        var to = new DateTime(2025, 06, 09);
+
+        var result = Reservation.Create(_spot, _user, from, to);
+
+        result.IsSuccess.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Create_Rejects_6_Working_Days_Across_Weekend()
+    {
+        var from = new DateTime(2025, 06, 02);
+        var to = new DateTime(2025, 06, 10);
+
+        var result = Reservation.Create(_spot, _user, from, to);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error!.Code.Should().Be("Reservation.TooLong");
+    }
+
+
+    [Fact]
     public void Create_InvalidPeriod_ReturnsFailure()
     {
         // Arrange
@@ -36,7 +60,7 @@ public class ReservationTests
     {
         // Arrange
         var from = DateTime.Today;
-        var to = from.AddDays(6);
+        var to = from.AddDays(8);
 
         // Act
         var r = Reservation.Create(_spot, _user, from, to);

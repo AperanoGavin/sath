@@ -26,30 +26,53 @@ namespace PRS.Domain.Entities
         }
 
         public static Result<Reservation> Create(
-            Spot spot,
-            User user,
-            DateTime from,
-            DateTime to)
+           Spot spot,
+           User user,
+           DateTime from,
+           DateTime to)
         {
             if (to <= from)
             {
                 return Result<Reservation>.Failure(new DomainError(
-                    "Reservation.InvalidPeriod",
-                    "Bad dates",
-                    "'To' must come after 'From'."));
+                            "Reservation.InvalidPeriod", "Bad dates", "'To' must come after 'From'."));
             }
 
-            var spanDays = (to - from).TotalDays;
-            var max = user.Role.Key == "Manager" ? 30 : 5;
-            if (spanDays > max)
+            if (user.Role.Key == "Manager")
             {
-                return Result<Reservation>.Failure(new DomainError(
-                    "Reservation.TooLong",
-                    "Period too long",
-                    $"Max reservation length is {max} days."));
+                var span = (to - from).TotalDays;
+                if (span > 30)
+                {
+                    return Result<Reservation>.Failure(new DomainError(
+                                "Reservation.TooLong", "Period too long",
+                                "Managers can book at most 30 days."));
+                }
+            }
+            else
+            {
+                int workingDays = CountWorkingDays(from, to);
+                if (workingDays > 5)
+                {
+                    return Result<Reservation>.Failure(new DomainError(
+                                "Reservation.TooLong", "Period too long",
+                                "Max reservation length is 5 working days."));
+                }
             }
 
             return Result<Reservation>.Success(new Reservation(spot, user, from, to));
+        }
+
+        private static int CountWorkingDays(DateTime from, DateTime toExclusive)
+        {
+            int count = 0;
+            for (var day = from.Date; day < toExclusive.Date; day = day.AddDays(1))
+            {
+                if (day.DayOfWeek is not DayOfWeek.Saturday
+                    and not DayOfWeek.Sunday)
+                {
+                    count++;
+                }
+            }
+            return count;
         }
 
         public Result Cancel()
