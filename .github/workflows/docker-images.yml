@@ -1,0 +1,46 @@
+name: Docker Image CI
+#build both image from the front and the backend to see if
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Test config docker for Backend  
+      run: |
+        docker-compose up -d   
+        sleep 30
+
+    - name: Test endpoint
+      run: |
+        site_online=$(curl -o /dev/null -s -w "%{http_code}\n" http://localhost:5000)
+        if [[ "$site_online" =~ ^4 ]] || [[ "$site_online" =~ ^5 ]]; then
+          echo "Test Failed $site_online"
+          exit 1
+        else
+          echo "Test Ok $site_online"
+        fi
+
+    - name: Test config docker for Frontend  
+      run: |
+        cd ./frontend
+        docker-compose up -d   
+        sleep 30
+
+    - name: Test endpoint
+      run: |
+        site_online=$(curl -o /dev/null -s -w "%{http_code}\n" http://localhost:4200)
+        if [[ "$site_online" =~ ^4 ]] || [[ "$site_online" =~ ^5 ]]; then
+          echo "Test Failed $site_online"
+          exit 1
+        else
+          echo "Test Ok $site_online"
+        fi
+    
+  
