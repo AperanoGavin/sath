@@ -2,4 +2,4 @@ services:
   backend:
     build: ./backend/
     ports:
-      - 5000:8080
+      - 8181:8080
