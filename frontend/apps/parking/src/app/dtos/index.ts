@@ -1,3 +1,5 @@
+export * from './ErrorResponse'
+
 export * from './CreateReservationDTO'
 export * from './CreateSpotDTO'
 export * from './ReservationDTO'
