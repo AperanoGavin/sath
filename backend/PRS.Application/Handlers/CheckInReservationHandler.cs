@@ -1,6 +1,5 @@
 using MediatR;
 
-using PRS.Application.Behaviors;
 using PRS.Application.Commands;
 using PRS.Domain.Core;
 using PRS.Domain.Errors;
@@ -23,16 +22,13 @@ public class CheckInReservationHandler(
         var r = await _repo.GetAsync(request.ReservationId, cancellationToken);
         if (r is null)
         {
-            return Result.Failure(new DomainError(
-                        "Reservation.NotFound",
-                        "Not found",
-                        $"No reservation {request.ReservationId}"));
+            return Result.Failure(new ReservationNotFoundError(request.ReservationId));
 
         }
         var ci = r.CheckIn(DateTime.UtcNow);
         if (ci.IsFailure)
         {
-            throw new DomainErrorException((DomainError)ci.Error!);
+            return Result.Failure(ci.Error);
         }
 
         await _repo.UpdateAsync(r, cancellationToken);

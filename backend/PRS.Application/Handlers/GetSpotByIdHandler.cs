@@ -20,9 +20,7 @@ public class GetSpotByIdHandler(ISpotRepository repo)
         var spot = await _repo.GetAsync(request.Id, cancellationToken);
         if (spot is null)
         {
-            return Result<SpotDto>.Failure(
-                    new DomainError("Spot.NotFound", "Not found",
-                        $"No spot with id {request.Id}"));
+            return Result<SpotDto>.Failure(new SpotNotFoundError(request.Id));
         }
 
         return Result<SpotDto>.Success(new SpotDto

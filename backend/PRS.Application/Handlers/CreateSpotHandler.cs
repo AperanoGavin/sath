@@ -1,10 +1,8 @@
 using MediatR;
 
-using PRS.Application.Behaviors;
 using PRS.Application.Commands;
 using PRS.Application.Models;
 using PRS.Domain.Core;
-using PRS.Domain.Errors;
 using PRS.Domain.Factories;
 using PRS.Domain.Repositories;
 
@@ -28,7 +26,7 @@ public class CreateSpotHandler(
         var creation = await _factory.Create(request.Key, [.. request.Capabilities]);
         if (creation.IsFailure)
         {
-            throw new DomainErrorException((DomainError)creation.Error!);
+            return Result<SpotDto>.Failure(creation.Error);
         }
 
         var spot = creation.Value;
@@ -46,4 +44,3 @@ public class CreateSpotHandler(
         return Result<SpotDto>.Success(dto);
     }
 }
-
