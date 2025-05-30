@@ -1,30 +1,30 @@
 # 🚀 Get Started with SATH
 
-## 📦 Prérequis
+## 📦 Prerequisites
 
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
 
 ## ▶️ Start
 
-1. Clonez le dépôt :
+1. Clone the repository :
 
    ```bash
    git clone https://github.com/AperanoGavin/sath.git
    cd sath
    ```
-2. a-Lancez le backend:
+2. a-  backend:
 
    ```bash
    docker-compose up -d
    ```
-   b- Lancez le frontend:
+   b-  frontend:
 
    ```bash
    cd frontend
    docker-compose up -d
    ```
-3. Accédez à l'application via votre navigateur à l'adresse suivante : [http://localhost:4200](http://localhost:4200)
+3. Access the application via your browser at the following address : [http://localhost:4200](http://localhost:4200)
 
 
 
