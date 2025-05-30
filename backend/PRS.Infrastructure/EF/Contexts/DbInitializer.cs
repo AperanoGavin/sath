@@ -34,6 +34,20 @@ internal static class DbInitializer
 
 
         context.Spots.AddRange(spots);
+
+        if (!context.Roles.Any() && !context.Users.Any())
+        {
+            var employeeRole = new UserRole("Employee", "Employee", "Regular employee");
+            var managerRole = new UserRole("Manager", "Manager", "Parking manager");
+            context.Roles.AddRange(employeeRole, managerRole);
+
+            var alice = User.Create("Alice", "alice@acme.com", employeeRole).Value;
+            var bob = User.Create("Bob", "bob@acme.com", managerRole).Value;
+            context.Users.AddRange(alice, bob);
+        }
+
+        context.SaveChanges();
+
         context.SaveChanges();
     }
 }
