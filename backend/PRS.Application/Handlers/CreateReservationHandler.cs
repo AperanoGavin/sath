@@ -1,10 +1,8 @@
 using MediatR;
 
-using PRS.Application.Behaviors;
 using PRS.Application.Commands;
 using PRS.Application.Models;
 using PRS.Domain.Core;
-using PRS.Domain.Errors;
 using PRS.Domain.Factories;
 using PRS.Domain.Repositories;
 
@@ -29,7 +27,7 @@ public class CreateReservationHandler(
 
         if (r.IsFailure)
         {
-            throw new DomainErrorException((DomainError)r.Error!);
+            return Result<ReservationDto>.Failure(r.Error);
         }
 
         var reservation = r.Value;

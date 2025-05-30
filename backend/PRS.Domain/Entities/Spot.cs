@@ -33,10 +33,7 @@ namespace PRS.Domain.Entities
         {
             if (string.IsNullOrWhiteSpace(key))
             {
-                return Result<Spot>.Failure(new DomainError(
-                    "Spot.InvalidKey",
-                    "Empty key",
-                    "Spot key cannot be empty."));
+                return Result<Spot>.Failure(new SpotInvalidKeyError());
             }
 
             return Result<Spot>.Success(new Spot(Guid.NewGuid(), key));
@@ -46,10 +43,7 @@ namespace PRS.Domain.Entities
         {
             if (_caps.Contains(cap))
             {
-                return Result.Failure(new DomainError(
-                    "Spot.DuplicateCapability",
-                    "Capability already exists",
-                    $"Capability '{cap}' is already assigned."));
+                return Result.Failure(new SpotDuplicateCapabilityError(cap));
             }
 
             _caps.Add(cap);
@@ -60,10 +54,7 @@ namespace PRS.Domain.Entities
         {
             if (!_caps.Contains(cap))
             {
-                return Result.Failure(new DomainError(
-                    "Spot.DoesNotHaveCapability",
-                    "Capability not assigned",
-                    $"Capability '{cap}' is not assigned."));
+                return Result.Failure(new SpotMissingCapabilityError(cap));
             }
 
             _caps.Remove(cap);
@@ -79,16 +70,12 @@ namespace PRS.Domain.Entities
         {
             var today = DateTime.UtcNow.Date;
             if (from.Date < today)
-                return Result<Reservation>.Failure(new DomainError(
-                    "Reservation.PastFrom", "Start date in the past",
-                    $"Cannot start before {today:yyyy-MM-dd}."));
+                return Result<Reservation>.Failure(new ReservationPastFromError(today));
 
             if (needsCharger
                 && !Capabilities.Contains(SpotCapability.ElectricCharger))
             {
-                return Result<Reservation>.Failure(new DomainError(
-                    "Reservation.ChargerRequired", "Charger needed",
-                    $"Spot '{Key}' has no electric charger."));
+                return Result<Reservation>.Failure(new ReservationCapabilityRequiredError(Key, SpotCapability.ElectricCharger));
             }
 
             var created = Reservation.Create(this, user, from, to);
@@ -98,9 +85,7 @@ namespace PRS.Domain.Entities
                     .IsSatisfiedBy(this, from, to, cancellationToken)
                     .ConfigureAwait(false))
             {
-                return Result<Reservation>.Failure(new DomainError(
-                    "Reservation.Overlap", "Time slot unavailable",
-                    $"Spot '{Key}' is already reserved {from:yyyy-MM-dd}→{to:yyyy-MM-dd}."));
+                return Result<Reservation>.Failure(new ReservationOverlapError(Key, from, to));
             }
 
             _reservations.Add(created.Value);
@@ -111,10 +96,9 @@ namespace PRS.Domain.Entities
         {
             var res = _reservations.SingleOrDefault(r => r.Id == reservationId);
             if (res is null)
-                return Result.Failure(new DomainError(
-                    "Reservation.NotFound",
-                    "Not found",
-                    $"No reservation with ID '{reservationId}'."));
+            {
+                return Result.Failure(new ReservationNotFoundError(reservationId));
+            }
 
             return res.CheckIn(at);
         }
@@ -124,10 +108,7 @@ namespace PRS.Domain.Entities
             var res = _reservations.SingleOrDefault(r => r.Id == reservationId);
             if (res is null)
             {
-                return Result.Failure(new DomainError(
-                            "Reservation.NotFound",
-                            "Not found",
-                            $"No reservation with ID '{reservationId}'."));
+                return Result.Failure(new ReservationNotFoundError(reservationId));
             }
 
             return res.Cancel();

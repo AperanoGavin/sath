@@ -2,10 +2,9 @@ namespace PRS.Presentation.Models;
 
 public record CreateReservationRequest
 {
-    public string SpotId { get; init; } = string.Empty;
-    public string UserId { get; init; } = string.Empty;
+    public Guid SpotId { get; init; }
+    public Guid UserId { get; init; }
     public DateTime From { get; init; }
     public DateTime To { get; init; }
-    public bool IsReservation { get; init; }
+    public bool NeedsCharger { get; init; }
 }
-

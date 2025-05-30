@@ -20,8 +20,7 @@ public class GetReservationByIdHandler(IReservationRepository repo)
         var r = await _repo.GetAsync(request.ReservationId, cancellationToken);
         if (r is null)
         {
-            return Result<ReservationDto>.Failure(new DomainError(
-                        "Reservation.NotFound", "Not found", $"No reservation {request.ReservationId}"));
+            return Result<ReservationDto>.Failure(new ReservationNotFoundError(request.ReservationId));
         }
 
         return Result<ReservationDto>.Success(new ReservationDto
