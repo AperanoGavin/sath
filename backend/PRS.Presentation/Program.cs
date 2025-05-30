@@ -1,4 +1,5 @@
 using PRS.Application;
+using PRS.Presentation.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,12 +11,15 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     });
 
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddApplication()
                 .AddEndpointsApiExplorer()
                 .AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.
 // TODO: For now let's enable the swagger for all environments
