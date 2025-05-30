@@ -14,20 +14,22 @@ internal class EFReservationRepository(AppDbContext ctx) : IReservationRepositor
 
     public async Task<Reservation?> GetAsync(Guid id, CancellationToken ct = default)
         => await _ctx.Reservations
-            .Include(r => r.Spot)
-            .FirstOrDefaultAsync(r => r.Id == id, ct);
+                     .Include(r => r.Spot)
+                     .Include(r => r.User)
+                     .FirstOrDefaultAsync(r => r.Id == id, ct);
 
-    public async Task<ICollection<Reservation>> GetBySpotAsync(
-        Guid spotId,
-        CancellationToken ct = default)
+    public async Task<ICollection<Reservation>> GetBySpotAsync(Guid spotId, CancellationToken ct = default)
         => await _ctx.Reservations
-            .Where(r => EntityFramework.Property<Guid>(r, "SpotId") == spotId)
-            .ToListAsync(ct);
+                     .Where(r => EntityFramework.Property<Guid>(r, "SpotId") == spotId)
+                     .Include(r => r.Spot)
+                     .Include(r => r.User)
+                     .ToListAsync(ct);
 
     public async Task<ICollection<Reservation>> GetAllAsync(CancellationToken ct = default)
         => await _ctx.Reservations
-            .Include(static r => r.Spot)
-            .ToListAsync(ct);
+                     .Include(static r => r.Spot)
+                     .Include(static r => r.User)
+                     .ToListAsync(ct);
 
     public Task AddAsync(Reservation reservation, CancellationToken ct = default)
     {

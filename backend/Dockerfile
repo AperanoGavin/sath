@@ -1,15 +1,26 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:35792ea4ad1db051981f62b313f1be3b46b1f45cadbaa3c288cd0d3056eefb83 AS build
-WORKDIR /App
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
 
-# Copy everything
-COPY ./PRS.Presentation/ ./
-# Restore as distinct layers
+COPY PRS.sln .
+
+COPY PRS.Domain/PRS.Domain.csproj         PRS.Domain/
+COPY PRS.Application/PRS.Application.csproj PRS.Application/
+COPY PRS.Infrastructure/PRS.Infrastructure.csproj PRS.Infrastructure/
+COPY PRS.Presentation/PRS.Presentation.csproj   PRS.Presentation/
+COPY PRS.Domain.Tests/PRS.Domain.Tests.csproj   PRS.Domain.Tests/
+
 RUN dotnet restore
-# Build and publish a release
-RUN dotnet publish -o out
 
-# Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:6c4df091e4e531bb93bdbfe7e7f0998e7ced344f54426b7e874116a3dc3233ff
-WORKDIR /App
-COPY --from=build /App/out .
+# 4) Copy the rest of your code
+COPY . .
+
+RUN dotnet publish \
+    PRS.Presentation/PRS.Presentation.csproj \
+    -c Release \
+    -o /app/publish \
+    --no-restore
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish ./
 ENTRYPOINT ["dotnet", "PRS.Presentation.dll"]

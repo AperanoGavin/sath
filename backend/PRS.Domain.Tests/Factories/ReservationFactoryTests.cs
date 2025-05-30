@@ -40,7 +40,7 @@ public class ReservationFactoryTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error!.Code.Should().Be("Reservation.SpotNotFound");
+        result.Error!.Code.Should().Be("Reservation.NotFound");
     }
 
     [Fact]
