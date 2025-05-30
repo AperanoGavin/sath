@@ -12,9 +12,9 @@ export interface ParkingState {
 export const ParkingStore = signalStore(
     withState<ParkingState>({
     }),
-    withComputed((store) => {
-    }),
-    withMethods((store, service = inject(ParkingService), router = inject(Router)) => ({
+    // withComputed((store) => {
+    // }),
+    // withMethods((store, service = inject(ParkingService), router = inject(Router)) => ({
         
-    }))
+    // }))
 );
