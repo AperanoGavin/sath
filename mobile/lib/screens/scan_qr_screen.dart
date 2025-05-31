@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:provider/provider.dart';
@@ -38,7 +37,6 @@ class _ScanQRScreenState extends State<ScanQRScreen> {
       if (_scanned) return;
       _scanned = true;
       final scannedText = scanData.code;
-      // We expect scannedText to be the reservation ID (string GUID)
       if (scannedText != null) {
         try {
           final reservationProv = Provider.of<ReservationProvider>(
@@ -46,11 +44,14 @@ class _ScanQRScreenState extends State<ScanQRScreen> {
             listen: false,
           );
           await reservationProv.checkInReservation(scannedText);
-          // Show a success dialog
+          // Show success dialog
           await showDialog(
             context: context,
             builder:
                 (_) => AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   title: const Text('Checked‐In'),
                   content: Text(
                     'Reservation ID $scannedText has been checked in.',
@@ -71,6 +72,9 @@ class _ScanQRScreenState extends State<ScanQRScreen> {
             context: context,
             builder:
                 (_) => AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   title: const Text('Error'),
                   content: Text(e.toString()),
                   actions: [
@@ -91,17 +95,32 @@ class _ScanQRScreenState extends State<ScanQRScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Scan QR to Check‐In')),
+      appBar: AppBar(
+        title: const Text('Scan QR to Check‐In'),
+        backgroundColor: Colors.white,
+        foregroundColor: theme.colorScheme.primary,
+        elevation: 1,
+      ),
       body: Column(
         children: [
           Expanded(
-            flex: 4,
+            flex: 6,
             child: QRView(key: qrKey, onQRViewCreated: _onQRViewCreated),
           ),
-          const Expanded(
-            flex: 1,
-            child: Center(child: Text('Point camera at reservation QR code')),
+          Expanded(
+            flex: 2,
+            child: Center(
+              child: Text(
+                'Point your camera at the reservation QR code',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: Colors.grey.shade700,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
           ),
         ],
       ),

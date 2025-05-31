@@ -23,53 +23,94 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context);
+    final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Log In')),
-      body:
-          auth.isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    const Text(
-                      'Select your user to log in:',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    const SizedBox(height: 16),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: auth.allUsers?.length ?? 0,
-                        itemBuilder: (ctx, i) {
-                          final user = auth.allUsers![i];
-                          return RadioListTile<User>(
-                            title: Text(user.name),
-                            subtitle: Text('${user.email} (${user.role.key})'),
-                            value: user,
-                            groupValue: selectedUser,
-                            onChanged: (u) {
-                              setState(() {
-                                selectedUser = u;
-                              });
-                            },
-                          );
-                        },
+      backgroundColor: Colors.white,
+      body: Center(
+        child:
+            auth.isLoading
+                ? const CircularProgressIndicator()
+                : SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    children: [
+                      // (Optional) replace with your own logo
+                      const SizedBox(height: 48),
+                      Icon(
+                        Icons.local_parking,
+                        size: 100,
+                        color: theme.colorScheme.primary,
                       ),
-                    ),
-                    ElevatedButton(
-                      onPressed:
-                          selectedUser == null
-                              ? null
-                              : () async {
-                                await auth.login(selectedUser!);
-                                // Once logged in, RootNavigator will rebuild to show HomeScreen
-                              },
-                      child: const Text('Log In'),
-                    ),
-                  ],
+                      const SizedBox(height: 24),
+                      Text(
+                        'Select Your User',
+                        style: theme.textTheme.headlineSmall!.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // List of users with radio buttons
+                      Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              for (var user in auth.allUsers ?? []) ...[
+                                RadioListTile<User>(
+                                  title: Text(user.name),
+                                  subtitle: Text(
+                                    '${user.email} (${user.role.key})',
+                                    style: theme.textTheme.bodySmall!.copyWith(
+                                      color: Colors.grey.shade600,
+                                    ),
+                                  ),
+                                  value: user,
+                                  groupValue: selectedUser,
+                                  onChanged: (u) {
+                                    setState(() {
+                                      selectedUser = u;
+                                    });
+                                  },
+                                ),
+                                const Divider(height: 1),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      SizedBox(
+                        width: double.infinity,
+                        height: 64,
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.login, color: Colors.white),
+                          label: const Text('Log In'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.colorScheme.primary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          onPressed:
+                              selectedUser == null
+                                  ? null
+                                  : () async {
+                                    await auth.login(selectedUser!);
+                                  },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+      ),
     );
   }
 }

@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:mobile/models/spot.dart';
 import 'package:mobile/providers/auth_provider.dart';
 import 'package:mobile/providers/reservation_provider.dart';
-import 'package:mobile/models/reservation.dart';
 import 'package:mobile/providers/spot_provider.dart';
 import 'package:intl/intl.dart';
 
@@ -33,8 +32,8 @@ class _MakeReservationScreenState extends State<MakeReservationScreen> {
 
   Future<void> _pickDateRange() async {
     final now = DateTime.now();
-    final initialDateRange =
-        fromDate != null && toDate != null
+    final initialRange =
+        (fromDate != null && toDate != null)
             ? DateTimeRange(start: fromDate!, end: toDate!)
             : DateTimeRange(start: now, end: now.add(const Duration(days: 1)));
 
@@ -42,9 +41,8 @@ class _MakeReservationScreenState extends State<MakeReservationScreen> {
       context: context,
       firstDate: now,
       lastDate: now.add(const Duration(days: 365)),
-      initialDateRange: initialDateRange,
+      initialDateRange: initialRange,
     );
-
     if (picked != null) {
       setState(() {
         fromDate = picked.start;
@@ -55,6 +53,7 @@ class _MakeReservationScreenState extends State<MakeReservationScreen> {
 
   Future<void> _submitReservation() async {
     if (selectedSpot == null || fromDate == null || toDate == null) return;
+
     setState(() => isSubmitting = true);
 
     try {
@@ -69,25 +68,28 @@ class _MakeReservationScreenState extends State<MakeReservationScreen> {
         spotId: selectedSpot!.id,
         userId: userId,
         from: fromDate!,
-        to: toDate!.add(const Duration(days: 1)), // backend expects exclusive?
+        to: toDate!.add(const Duration(days: 1)),
         needsCharger: needsCharger,
       );
-      // On success, show dialog and pop back
+
+      // Show confirmation dialog
       await showDialog(
         context: context,
         builder:
             (_) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               title: const Text('Reservation Confirmed'),
               content: Text(
                 'Your reservation (ID: ${res.id}) for spot ${selectedSpot!.key}\n'
-                'from ${DateFormat.yMd().format(fromDate!)} to ${DateFormat.yMd().format(toDate!)} has been made.',
+                'from ${DateFormat.yMMMEd().format(fromDate!)} '
+                'to ${DateFormat.yMMMEd().format(toDate!)} has been made.',
               ),
               actions: [
                 TextButton(
                   onPressed: () {
-                    Navigator.of(
-                      context,
-                    ).popUntil((route) => route.isFirst); // Go to Home
+                    Navigator.of(context).popUntil((route) => route.isFirst);
                   },
                   child: const Text('OK'),
                 ),
@@ -95,12 +97,14 @@ class _MakeReservationScreenState extends State<MakeReservationScreen> {
             ),
       );
     } catch (e) {
-      // Show a snackbar or alert dialog with error
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: Colors.red.shade300,
+        ),
+      );
     } finally {
-      setState(() => isSubmitting = false);
+      if (mounted) setState(() => isSubmitting = false);
     }
   }
 
@@ -108,112 +112,233 @@ class _MakeReservationScreenState extends State<MakeReservationScreen> {
   Widget build(BuildContext context) {
     final spotProv = Provider.of<SpotProvider>(context);
     final allSpots = spotProv.spots ?? [];
-    final user = Provider.of<AuthProvider>(context).currentUser!;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Make a Reservation')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      appBar: AppBar(
+        title: const Text('Make a Reservation'),
+        backgroundColor: Colors.white,
+        foregroundColor: theme.colorScheme.primary,
+        elevation: 1,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // 1. If no prefilledSpot, show a dropdown to select a spot
-            if (widget.prefilledSpot == null) ...[
-              DropdownButtonFormField<Spot>(
-                value: selectedSpot,
-                items:
-                    allSpots
-                        .map(
-                          (s) => DropdownMenuItem(
-                            value: s,
+            // -- 1) Select Spot Card --
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 20,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      '1. Choose a Spot',
+                      style: theme.textTheme.titleMedium!.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    if (widget.prefilledSpot == null) ...[
+                      DropdownButtonFormField<Spot>(
+                        value: selectedSpot,
+                        decoration: InputDecoration(
+                          labelText: 'Select Spot',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey.shade100,
+                        ),
+                        items:
+                            allSpots
+                                .map(
+                                  (s) => DropdownMenuItem(
+                                    value: s,
+                                    child: Text(
+                                      '${s.key} '
+                                      '${s.capabilities.contains('ElectricCharger') ? '⚡' : ''}',
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                        onChanged: (s) {
+                          setState(() {
+                            selectedSpot = s;
+                            needsCharger = s!.capabilities.contains(
+                              'ElectricCharger',
+                            );
+                          });
+                        },
+                      ),
+                    ] else ...[
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.local_parking,
+                            color: theme.colorScheme.primary,
+                          ),
+                          const SizedBox(width: 12),
+                          Flexible(
                             child: Text(
-                              '${s.key} '
-                              '${s.capabilities.contains('ElectricCharger') ? '⚡' : ''}',
+                              'Spot: ${widget.prefilledSpot!.key}',
+                              style: theme.textTheme.bodyLarge,
                             ),
                           ),
-                        )
-                        .toList(),
-                onChanged: (s) {
-                  setState(() {
-                    selectedSpot = s;
-                    needsCharger = s!.capabilities.contains('ElectricCharger');
-                  });
-                },
-                decoration: const InputDecoration(
-                  labelText: 'Select Spot',
-                  border: OutlineInputBorder(),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Checkbox(value: needsCharger, onChanged: null),
+                          const SizedBox(width: 4),
+                          const Text('Electric Charger (fixed)'),
+                        ],
+                      ),
+                    ],
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-            ] else ...[
-              Text(
-                'Spot: ${widget.prefilledSpot!.key}',
-                style: const TextStyle(fontSize: 18),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Checkbox(value: needsCharger, onChanged: null),
-                  const Text('Electric Charger (fixed)'),
-                ],
-              ),
-              const SizedBox(height: 16),
-            ],
-
-            // 2. Date range picker
-            ElevatedButton.icon(
-              icon: const Icon(Icons.date_range),
-              label: Text(
-                fromDate == null || toDate == null
-                    ? 'Pick Date Range'
-                    : '${DateFormat.yMd().format(fromDate!)} → ${DateFormat.yMd().format(toDate!)}',
-              ),
-              onPressed: _pickDateRange,
             ),
-            const SizedBox(height: 16),
 
-            // 3. “Needs Charger” (if spot does not have one, disable)
-            if (widget.prefilledSpot == null ||
-                (widget.prefilledSpot != null &&
-                    widget.prefilledSpot!.capabilities.contains(
-                      'ElectricCharger',
-                    ))) ...[
-              Row(
-                children: [
-                  Checkbox(
-                    value: needsCharger,
-                    onChanged: (val) {
-                      setState(() {
-                        needsCharger = val ?? false;
-                      });
-                    },
+            const SizedBox(height: 24),
+
+            // -- 2) Date Range Card --
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: InkWell(
+                onTap: _pickDateRange,
+                borderRadius: BorderRadius.circular(12),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 20,
                   ),
-                  const Text('Needs Electric Charger'),
-                ],
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.date_range,
+                        color: theme.colorScheme.primary,
+                        size: 28,
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          fromDate == null || toDate == null
+                              ? 'Pick a Date Range'
+                              : '${DateFormat.yMMMEd().format(fromDate!)} → '
+                                  '${DateFormat.yMMMEd().format(toDate!)}',
+                          style: theme.textTheme.bodyLarge!.copyWith(
+                            color:
+                                fromDate == null
+                                    ? Colors.grey.shade600
+                                    : Colors.black87,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              const SizedBox(height: 16),
-            ] else ...[
-              // Spot has no charger; disable the checkbox
-              Row(
-                children: const [
-                  Checkbox(value: false, onChanged: null),
-                  Text('No Electric Charger available for this spot'),
-                ],
-              ),
-              const SizedBox(height: 16),
-            ],
+            ),
 
-            // 4. Submit button
+            const SizedBox(height: 24),
+
+            // -- 3) Charger Option Card --
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 20,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      '3. Options',
+                      style: theme.textTheme.titleMedium!.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    if (widget.prefilledSpot == null ||
+                        (widget.prefilledSpot != null &&
+                            widget.prefilledSpot!.capabilities.contains(
+                              'ElectricCharger',
+                            ))) ...[
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: needsCharger,
+                            onChanged: (val) {
+                              setState(() {
+                                needsCharger = val ?? false;
+                              });
+                            },
+                          ),
+                          const SizedBox(width: 4),
+                          const Text('Needs Electric Charger'),
+                        ],
+                      ),
+                    ] else ...[
+                      Row(
+                        children: const [
+                          Icon(Icons.power_off, color: Colors.grey),
+                          SizedBox(width: 12),
+                          Text('No Electric Charger available'),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 32),
+
+            // -- 4) Submit Button --
             isSubmitting
-                ? const CircularProgressIndicator()
-                : ElevatedButton.icon(
-                  icon: const Icon(Icons.check),
-                  label: const Text('Reserve'),
-                  onPressed:
-                      (selectedSpot == null ||
-                              fromDate == null ||
-                              toDate == null)
-                          ? null
-                          : _submitReservation,
+                ? Center(
+                  child: CircularProgressIndicator(
+                    color: theme.colorScheme.primary,
+                  ),
+                )
+                : SizedBox(
+                  height: 64,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.check_circle_outline),
+                    label: const Text(
+                      'Reserve Now',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      backgroundColor: theme.colorScheme.primary,
+                    ),
+                    onPressed:
+                        (selectedSpot == null ||
+                                fromDate == null ||
+                                toDate == null)
+                            ? null
+                            : _submitReservation,
+                  ),
                 ),
           ],
         ),
