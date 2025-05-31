@@ -1,4 +1,3 @@
-// header.component.ts
 import {
   Component,
   Inject,
@@ -18,7 +17,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TranslationKeys } from '../keys.interface';
-import { AuthStore } from '../stores/auth.store';
+import { AuthStore } from '@auth/stores';
 
 import { AUTH_SERVICE, IAuthService } from '@auth/domain';
 import { COGNITO_AUTH_PROVIDER } from '@auth/infrastructure/CognitoAuthService';
@@ -44,8 +43,9 @@ import { COGNITO_AUTH_PROVIDER } from '@auth/infrastructure/CognitoAuthService';
 export class HeaderComponent implements OnInit {
   private env: Environment = defaultEnv;
 
-  // on récupère l’impl via le token abstrait
+  // Injection de l’implémentation PKCE via le token abstrait
   private readonly authService = inject(AUTH_SERVICE) as IAuthService;
+
   readonly authStore = inject(AuthStore);
   translationKeys = TranslationKeys;
 
@@ -59,7 +59,6 @@ export class HeaderComponent implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       this.env = this.transferState.get<Environment>(envStateKey, defaultEnv);
     }
-    console.log('Environment:', this.env);
   }
 
   get languages(): string[] {
@@ -70,8 +69,10 @@ export class HeaderComponent implements OnInit {
     return this.translateService.currentLang;
   }
 
+  // sa affiche le username stocké dans AuthStore, ou 'anonymous' si non connecté
   get username(): string {
-    return 'anonymous';
+    const userInfo = this.authStore.userInfo();
+    return userInfo ? userInfo.username : 'anonymous';
   }
 
   changeLang(lang: string): void {
@@ -83,10 +84,14 @@ export class HeaderComponent implements OnInit {
   }
 
   logout(): void {
+    // 1.déclenche le logout côté Cognito (redirection vers logoutUri)
+    this.authService.logout();
+    // 2. vide le store local (supprime token + userInfo)
     this.authStore.logout();
   }
 
   login(): void {
+    //déclenche le flux PKCE → redirige sur Hosted UI Cognito
     this.authService.login();
   }
 }
