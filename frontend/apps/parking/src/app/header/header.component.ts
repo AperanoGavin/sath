@@ -44,10 +44,8 @@ import { COGNITO_AUTH_PROVIDER } from '@auth/infrastructure/CognitoAuthService';
 export class HeaderComponent implements OnInit {
   private env: Environment = defaultEnv;
 
-  // Injection du service Cognito PKCE
   private readonly authService = inject(AUTH_SERVICE) as IAuthService;
 
-  // On récupère le store
   readonly authStore = inject(AuthStore);
   translationKeys = TranslationKeys;
 
@@ -71,7 +69,6 @@ export class HeaderComponent implements OnInit {
     return this.translateService.currentLang;
   }
 
-  /** Affiche le username depuis le store, ou “anonymous” si non connecté */
   get username(): string {
     const userInfo = this.authStore.userInfo();
     return userInfo ? userInfo.username : 'anonymous';
@@ -85,15 +82,11 @@ export class HeaderComponent implements OnInit {
     return lang === 'en' ? 'us' : lang;
   }
 
-  /** Logout complet : déclenche la redirection Cognito + vide le store local */
   logout(): void {
-    // 1) Redirige vers l’URL de logout Cognito
     this.authService.logout();
-    // 2) Vide le store local (token + userInfo)
     this.authStore.logout();
   }
 
-  /** Lance le flux PKCE vers Cognito Hosted UI */
   login(): void {
     this.authService.login();
   }
