@@ -8,7 +8,7 @@ export interface CognitoEnv {
 export const cognitoEnv: CognitoEnv = {
   domain: 'https://eu-west-1czfshuw1u.auth.eu-west-1.amazoncognito.com',
 
-  clientId: '622o4sqg2h9e4t4gu47fap5vi0',
+  clientId: 'rdi4g0c5qvmbfuf5kg0g5u31',
 
   redirectUri: 'http://localhost:4200/',
 

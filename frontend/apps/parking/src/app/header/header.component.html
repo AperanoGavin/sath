@@ -5,7 +5,7 @@
         <p class="mx-5 text-center my-2">
           {{ username }}
         </p>
-        <hr>
+        <hr />
       </span>
       <a [routerLink]="['/editprofile']">
         <button mat-menu-item>{{ translationKeys.editProfile | translate }}</button>
@@ -13,7 +13,7 @@
       <a [routerLink]="['/profile']">
         <button mat-menu-item>{{ translationKeys.profile | translate }}</button>
       </a>
-      <hr>
+      <hr />
       <button mat-menu-item (click)="logout()">
         {{ translationKeys.logout | translate }}
       </button>
@@ -51,19 +51,10 @@
   </div>
   <div class="flex justify-between gap-4 text-slate-100 items-center">
     <div class="relative flex items-baseline">
-      <mat-icon
-        *ngIf="authStore.isAuthenticated()"
-        class="h-full w-full hover:text-accent duration-100 cursor-pointer"
-      >mail</mat-icon>
+      <mat-icon *ngIf="authStore.isAuthenticated()" class="h-full w-full hover:text-accent duration-100 cursor-pointer">mail</mat-icon>
     </div>
     <mat-icon class="hover:text-accent duration-100 cursor-pointer">dark_mode</mat-icon>
-    <mat-icon
-      class="hover:text-accent duration-100 cursor-pointer"
-      [matMenuTriggerFor]="user"
-    >account_circle</mat-icon>
-    <mat-icon
-      class="hover:text-accent duration-100 cursor-pointer"
-      [matMenuTriggerFor]="langs"
-    >language</mat-icon>
+    <mat-icon class="hover:text-accent duration-100 cursor-pointer" [matMenuTriggerFor]="user">account_circle</mat-icon>
+    <mat-icon class="hover:text-accent duration-100 cursor-pointer" [matMenuTriggerFor]="langs">language</mat-icon>
   </div>
 </mat-toolbar-row>
