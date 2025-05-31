@@ -14,4 +14,8 @@
     <ProjectReference Include="..\PRS.Application\PRS.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="PRS.Presentation.Tests" />
+  </ItemGroup>
+
 </Project>
