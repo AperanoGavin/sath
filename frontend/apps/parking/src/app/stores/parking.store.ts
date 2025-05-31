@@ -1,11 +1,11 @@
 import { signalStore, withState, withMethods, withComputed, patchState } from '@ngrx/signals';
-import { debounceTime, distinctUntilChanged, exhaustMap, pipe, switchMap, tap } from 'rxjs';
+import { concatMap, debounceTime, distinctUntilChanged, exhaustMap, from, mergeMap, of, pipe, switchMap, tap } from 'rxjs';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { tapResponse } from '@ngrx/operators';
 import { computed, inject } from '@angular/core';
 import { ParkingService } from '../services/parking.service';
 import { Router } from '@angular/router';
-import { CreateSpotDTO, SpotDTO, SpotCapability, ErrorResponse } from '../dtos';
+import { CreateSpotDTO, SpotDTO, SpotCapability, ErrorResponse, ReservationDTO, CreateReservationDTO } from '../dtos';
 import { AlertService } from '../services/alert.service';
 
 export interface ParkingState {
@@ -13,6 +13,9 @@ export interface ParkingState {
   spotCapabilities: SpotCapability[];
   loading: boolean;
   error: string | null;
+  reservations: Map<string, ReservationDTO[]>;
+  startDate: Date | null;
+  endDate: Date | null;
 }
 
 const initialState: ParkingState = {
@@ -20,6 +23,9 @@ const initialState: ParkingState = {
   spotCapabilities: [],
   loading: false,
   error: null,
+  reservations: new Map<string, ReservationDTO[]>(),
+  startDate: null,
+  endDate: null,
 };
 
 export const ParkingStore = signalStore(
@@ -28,31 +34,67 @@ export const ParkingStore = signalStore(
   withComputed((_store) => ({
   })),
   withMethods((store, parkingService = inject(ParkingService), _router = inject(Router), alertService = inject(AlertService)) => ({
+    setStartDate: rxMethod<Date | null>(
+      pipe(
+        tap((date) => patchState(store, { startDate: date })),
+        distinctUntilChanged(),
+      )
+    ),
+    setEndDate: rxMethod<Date | null>(
+      pipe(
+        tap((date) => patchState(store, { endDate: date })),
+        distinctUntilChanged(),
+      )
+    ),
     loadSpots: rxMethod<void>(
-        pipe(
-          tap(() => patchState(store, { loading: true, error: null })),
-          switchMap(() =>
-            parkingService.getAll().pipe(
-              tapResponse({
-                next: (spots) => patchState(store, { spots, loading: false }),
-                error: (error: ErrorResponse) => {
-                  patchState(store, { error: error.detail, loading: false });
-                  alertService.error(error.detail, 'error');
-                },
-              })
-            )
-          )
-        )
-      ),
-  })),
-  withMethods((store, parkingService = inject(ParkingService), _router = inject(Router), alertService = inject(AlertService)) => ({
-    loadSpotCapabilities: rxMethod<void>(
       pipe(
         tap(() => patchState(store, { loading: true, error: null })),
         switchMap(() =>
-          parkingService.getSpotCapabilities().pipe(
+          parkingService.getAll().pipe(
             tapResponse({
-              next: (spotCapabilities) => patchState(store, { spotCapabilities, loading: false }),
+              next: (spots) => {
+                console.log('Spots loaded:', spots);
+                patchState(store, { spots, loading: false });
+              },
+              error: (error: ErrorResponse) => {
+                patchState(store, { error: error.detail, loading: false });
+                alertService.error(error.detail, 'error');
+              },
+            }),
+          ),
+        ),
+        switchMap((spots) => {
+          return from(spots).pipe(
+            mergeMap((spot) =>
+              parkingService.getSpotCalendar(spot.id).pipe(
+                tapResponse({
+                  next: (calendar) => {
+                    const reservations = new Map(store.reservations());
+                    reservations.set(spot.id, calendar);
+                    patchState(store, { reservations });
+                  },
+                  error: (error: ErrorResponse) => {
+                    console.error(`Error loading calendar for spot ${spot.id}:`);
+                  },
+                })
+              )
+            )
+          )
+        }),
+      )
+    ),
+  })),
+  withMethods((store, parkingService = inject(ParkingService), _router = inject(Router), alertService = inject(AlertService)) => ({
+    loadCapabilities: rxMethod<void>(
+      pipe(
+        tap(() => patchState(store, { loading: true, error: null })),
+        switchMap(() =>
+          parkingService.getCapabilities().pipe(
+            tapResponse({
+              next: (spotCapabilities) => {
+                console.log('Spot capabilities loaded:', spotCapabilities);
+                patchState(store, { spotCapabilities, loading: false })
+              },
               error: (error: ErrorResponse) => {
                 patchState(store, { error: error.detail, loading: false });
                 alertService.error(error.detail, 'error');
@@ -63,15 +105,14 @@ export const ParkingStore = signalStore(
       )
     ),
 
-    createSpot: rxMethod<CreateSpotDTO>(
+    createSpotReservation: rxMethod<CreateReservationDTO>(
       pipe(
         tap(() => patchState(store, { loading: true, error: null })),
         switchMap((dto) =>
-          parkingService.create(dto).pipe(
+          parkingService.createSpotReservation(dto).pipe(
             tapResponse({
               next: () => {
                 patchState(store, { loading: false });
-                // Optionally reload spots or navigate away
                 store.loadSpots();
               },
               error: (error: ErrorResponse) => {
@@ -94,23 +135,6 @@ export const ParkingStore = signalStore(
                 patchState(store, { loading: false });
                 store.loadSpots();
               },
-              error: (error: ErrorResponse) => {
-                patchState(store, { error: error.detail, loading: false });
-                alertService.error(error.detail, 'error');
-              },
-            })
-          )
-        )
-      )
-    ),
-
-    getSpotCalendar: rxMethod<string>(
-      pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
-        switchMap((id) =>
-          parkingService.getSpotCalendar(id).pipe(
-            tapResponse({
-              next: () => patchState(store, { loading: false }),
               error: (error: ErrorResponse) => {
                 patchState(store, { error: error.detail, loading: false });
                 alertService.error(error.detail, 'error');

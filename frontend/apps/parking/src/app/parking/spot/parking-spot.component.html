@@ -1,8 +1,18 @@
 <div class="flex drop-zone h-40 w-40" (dragover)="onDragOver($event)" (dragleave)="onDragOver($event)" (drop)="onDrop($event)"
     (click)="spotClicked()" (keypress)="spotClicked()">
-    @if (car()) {
-        <img draggable="false" class="mx-auto" alt="user car" [src]="car()">
+    @if (car() || !isSlotAvailable()) {
+        <img draggable="false" class="mx-auto" alt="user car" [src]="car() || (!isSlotAvailable() ? '/assets/voiture2.png' : '')">
     } @else {
-        <p class="hover:underline text-primary-black underline-offset-2 hover:text-accent duration-100 h-full w-full">Place n°{{spotNumber()}}</p>
+        <div class="flex flex-col gap-3 text-center">
+            <p class="hover:underline text-primary-black underline-offset-2 hover:text-accent duration-100 h-full w-full">Place n°{{spotNumber()}}</p>
+            @if (capabilities()) {
+                <ul class="list-disc">
+                    @for (capability of capabilities(); track $index) {
+                        <li>{{ capability }}</li>
+                    }
+                </ul>
+            } @else {
+            }
+        </div>
     }
 </div>

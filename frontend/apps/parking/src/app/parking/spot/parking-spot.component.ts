@@ -13,6 +13,7 @@ import { AuthStore } from '../../stores/auth.store';
 import { ParkingService } from '../../services/parking.service';
 import { AlertService } from '../../services/alert.service';
 import { ParkingStore } from '../../stores/parking.store';
+import { SpotCapability } from '../../dtos';
 
 @Component({
   selector: 'app-parking-parking-spot',
@@ -46,7 +47,9 @@ export class ParkingSpotComponent implements OnInit {
 
   isDragOver = false;
 
-  spotNumber = input.required<number>()
+  id = input.required<string>();
+  spotNumber = input.required<string>();
+  capabilities = input.required<SpotCapability[]>();
   car = signal<string | null>(null);
 
   onDragOver(event: DragEvent) {
@@ -72,8 +75,25 @@ export class ParkingSpotComponent implements OnInit {
     const imgElement = parsedDocument.querySelector('img');
     const image = imgElement ? imgElement.src : '';
 
+    const from = this.parkingStore.startDate();
+    const to = this.parkingStore.endDate();
+
+    if (from === null || to === null) {
+      this.alertService.error('Veuillez sélectionner une date de début et de fin avant de déposer la voiture.', 'error');
+      return;
+    }
+
     if (confirm('Voulez vous déposer la voiture ici ?')) {
-      this.car.set(image);
+      if (this.isSlotAvailable()) {
+        this.car.set(image);
+        this.parkingStore.createSpotReservation({
+          spotId: this.id(),
+          userId: 'e903b35d-9dac-4eba-9e28-76912b62fb1c',
+          from,
+          to,
+          isReservation: true,
+        });
+      }
     }
   }
 
@@ -85,5 +105,21 @@ export class ParkingSpotComponent implements OnInit {
 
   spotClicked() {
     // 
+  }
+
+  isSlotAvailable(): boolean {
+    const reservations = this.parkingStore.reservations().get(this.id());
+    const startDate = this.parkingStore.startDate();
+    const endDate = this.parkingStore.endDate();
+
+    if (!reservations || !startDate || !endDate) {
+      return true;
+    }
+
+    return !reservations.some(reservation => {
+      const reservationStart = new Date(reservation.from);
+      const reservationEnd = new Date(reservation.to);
+      return (startDate < reservationEnd && endDate > reservationStart);
+    });
   }
 }

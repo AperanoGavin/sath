@@ -1,32 +1,71 @@
 <div class="flex h-screen w-full">
-    <div class="w-4/24 bg-gray-200 h-full overflow-hidden p-6">
+    <!-- Div de gauche fixe -->
+    <div class="w-1/5 bg-gray-200 p-6 fixed h-full overflow-y-auto mt-15">
         <p class="text-lg">Bonjour John Doe !</p>
-        <p>Glisser deposer votre vehicule sur la place de parking désiré pour la reserver</p>
+        <p>Glisser déposer votre véhicule sur la place de parking désiré pour la réserver</p>
 
         <div class="w-7/12 h-fit mx-auto mt-10">
             <lib-images-viewer [images]="cars"></lib-images-viewer>
         </div>
-        <!-- <img draggable="true" alt="user car" class="w-5/12 mt-20 mx-auto" src="/assets/flashmcqueen.png"> -->
+
+        <div class="mx-auto mt-10 w-3/4">
+            <mat-form-field>
+                <mat-label>Plage de reservation</mat-label>
+                <mat-date-range-input [rangePicker]="picker" [formGroup]="range" (dateChange)="onDateChange()">
+                    <input matStartDate placeholder="Date de début" formControlName="start">
+                    <input matEndDate placeholder="Date de fin" formControlName="end">
+                </mat-date-range-input>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-date-range-picker #picker></mat-date-range-picker>
+            </mat-form-field>
+        </div>
+          
     </div>
 
-    <div class="w-px bg-black"></div>
-
-    <div class="p-6 w-20/24 mx-auto ">
+    <!-- Div de droite défilable -->
+    <div class="w-4/5 ml-auto pl-6 h-full overflow-y-auto mt-20">
         <h1 class="text-3xl">Parking</h1>
 
         <div class="flex flex-col items-center mt-5 gap-5">
-            <div class="grid grid-cols-8 grid-rows-1 gap-4 w-3/4">
-                @for (item of firstLineSpots; track $index) {
-                    <app-parking-parking-spot [spotNumber]="item"></app-parking-parking-spot>
+            <div class="grid grid-cols-10 grid-rows-1 gap-4 w-full">
+                @for (item of this.parkingStore.spots().slice(0, 10); track $index) {
+                    <app-parking-parking-spot [id]="item.id" [capabilities]="item.capabilities" [spotNumber]="item.key"></app-parking-parking-spot>
                 }
             </div>
-    
-            <div class="grid grid-cols-8 grid-rows-1 gap-4 w-3/4">
-                @for (item of secondLineSpots; track $index) {
-                    <app-parking-parking-spot [spotNumber]="item"></app-parking-parking-spot>
+
+            <div class="grid grid-cols-10 grid-rows-1 gap-4 w-full">
+                @for (item of this.parkingStore.spots().slice(10, 20); track $index) {
+                    <app-parking-parking-spot [id]="item.id" [capabilities]="item.capabilities" [spotNumber]="item.key"></app-parking-parking-spot>
+                }
+            </div>
+        </div>
+
+        <div class="flex flex-col items-center mt-20 gap-5">
+            <div class="grid grid-cols-10 grid-rows-1 gap-4 w-full">
+                @for (item of this.parkingStore.spots().slice(20, 30); track $index) {
+                    <app-parking-parking-spot [id]="item.id" [capabilities]="item.capabilities" [spotNumber]="item.key"></app-parking-parking-spot>
+                }
+            </div>
+
+            <div class="grid grid-cols-10 grid-rows-1 gap-4 w-full">
+                @for (item of this.parkingStore.spots().slice(30, 40); track $index) {
+                    <app-parking-parking-spot [id]="item.id" [capabilities]="item.capabilities" [spotNumber]="item.key"></app-parking-parking-spot>
+                }
+            </div>
+        </div>
+
+        <div class="flex flex-col items-center mt-20 gap-5">
+            <div class="grid grid-cols-10 grid-rows-1 gap-4 w-full">
+                @for (item of this.parkingStore.spots().slice(40, 50); track $index) {
+                    <app-parking-parking-spot [id]="item.id" [capabilities]="item.capabilities" [spotNumber]="item.key"></app-parking-parking-spot>
+                }
+            </div>
+
+            <div class="grid grid-cols-10 grid-rows-1 gap-4 w-full">
+                @for (item of this.parkingStore.spots().slice(50, 60); track $index) {
+                    <app-parking-parking-spot [id]="item.id" [capabilities]="item.capabilities" [spotNumber]="item.key"></app-parking-parking-spot>
                 }
             </div>
         </div>
     </div>
-
 </div>

@@ -42,23 +42,17 @@
 </mat-menu>
 
 
-<mat-toolbar-row class="flex justify-between bg-primary shadow-xl p-4 text-lg">
+<mat-toolbar-row class="flex justify-between bg-primary shadow-xl p-4 text-lg fixed w-full" style="z-index: 1000;">
     <div class="flex justify-around gap-4 text-slate-100 items-center">
         <a [routerLink]="['/']" class="font-semibold">Parking Booking</a>
         <div class="flex justify-around gap-5 ml-7">
             <a [routerLink]="['/parkings']" href="#" class="hover:text-accent duration-100">Parkings</a>
-            <!-- <a [routerLink]="['/catalog']" href="#" class="hover:text-accent duration-100">{{ translationKeys.catalog | translate }}</a> -->
         </div>
     </div>
     <div class="flex justify-between gap-4 text-slate-100 items-center">
         <div class="relative flex items-baseline">
             <mat-icon class="h-full w-full hover:text-accent duration-100 cursor-pointer" *ngIf="this.authStore.isAuthenticated()">mail</mat-icon>
-            <!-- <mat-icon class="h-full w-full hover:text-accent duration-100 cursor-pointer" (click)="messageStore.tchatVisible() ? messageStore.hideTchat() : messageStore.showTchat()" *ngIf="this.authStore.isAuthenticated()">mail</mat-icon> -->
-            <!-- @if (messageStore.conversationsWithNewMessages().size) {
-                <svg class="absolute -top-1 -right-1" fill="deepskyblue" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12"/></svg>
-            } -->
         </div>
-        <!-- <mat-icon *ngIf="authStore.isAuthenticated()" [routerLink]="['/groups']" class="hover:text-accent duration-100 cursor-pointer">group</mat-icon> -->
         <mat-icon class="hover:text-accent duration-100 cursor-pointer">dark_mode</mat-icon>
         <mat-icon class="hover:text-accent duration-100 cursor-pointer" [matMenuTriggerFor]="user">account_circle</mat-icon>
         <mat-icon class="hover:text-accent duration-100 cursor-pointer" [matMenuTriggerFor]="langs">language</mat-icon>

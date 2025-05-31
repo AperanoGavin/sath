@@ -28,9 +28,7 @@ const intializeAppFn = () => {
 export function transferStateFactory(transferState: TransferState) {
   return () => {
     const vars: Environment = {
-      AUTH_URL: process.env['AUTH_URL'] || '',
-      PROJECT_URL: process.env['PROJECT_URL'] || '',
-      SOCIAL_URL: process.env['SOCIAL_URL'] || '',
+      PARKING_URL: process.env['PARKING_URL'] || '',
     };
     transferState.set<Environment>(envStateKey, vars);
   };
