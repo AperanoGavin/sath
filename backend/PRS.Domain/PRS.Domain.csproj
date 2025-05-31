@@ -9,6 +9,7 @@
   <ItemGroup>
     <InternalsVisibleTo Include="PRS.Domain.Tests" />
     <InternalsVisibleTo Include="PRS.Application.Tests" />
+    <InternalsVisibleTo Include="PRS.Infrastructure.Tests" />
   </ItemGroup>
 
 </Project>
