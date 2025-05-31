@@ -10,16 +10,59 @@ class SpotTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasCharger = spot.capabilities.contains('ElectricCharger');
+
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      child: ListTile(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
         onTap: onTap,
-        title: Text('Spot ${spot.key}', style: const TextStyle(fontSize: 18)),
-        subtitle: Text(
-          hasCharger ? '⚡ Electric Charger' : 'No charger',
-          style: TextStyle(color: hasCharger ? Colors.green : Colors.grey[600]),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color:
+                      hasCharger ? Colors.green.shade100 : Colors.grey.shade200,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.local_parking,
+                    size: 28,
+                    color:
+                        hasCharger
+                            ? Colors.green.shade700
+                            : Colors.grey.shade700,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  'Spot ${spot.key}',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.w600),
+                ),
+              ),
+              if (hasCharger) ...[
+                Icon(Icons.ev_station, color: Colors.green.shade700, size: 20),
+                const SizedBox(width: 6),
+                Text('EV', style: TextStyle(color: Colors.green.shade700)),
+              ] else ...[
+                Icon(Icons.power_off, color: Colors.grey, size: 20),
+                const SizedBox(width: 6),
+                Text('No', style: TextStyle(color: Colors.grey.shade600)),
+              ],
+              const SizedBox(width: 8),
+              Icon(Icons.chevron_right, color: Colors.grey.shade600),
+            ],
+          ),
         ),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       ),
     );
   }

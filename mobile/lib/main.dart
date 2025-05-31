@@ -22,29 +22,31 @@ class ParkingReservationApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ReservationProvider()),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Parking Reservation',
-        theme: ThemeData(primarySwatch: Colors.blue),
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          scaffoldBackgroundColor: Colors.white,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
         home: const RootNavigator(),
       ),
     );
   }
 }
 
-/// RootNavigator checks if the user is logged in; if not, shows LoginScreen.
-/// Otherwise, shows HomeScreen.
 class RootNavigator extends StatelessWidget {
   const RootNavigator({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context);
-    // While AuthProvider is loading from SharedPreferences, show a splash
     if (auth.isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
-    if (!auth.isLoggedIn) {
-      return const LoginScreen();
-    }
-    return const HomeScreen();
+    return auth.isLoggedIn ? const HomeScreen() : const LoginScreen();
   }
 }
