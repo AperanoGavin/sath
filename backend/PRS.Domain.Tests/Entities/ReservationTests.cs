@@ -59,8 +59,8 @@ public class ReservationTests
     public void Create_ExceedsMaxDaysForEmployee_ReturnsFailure()
     {
         // Arrange
-        var from = DateTime.Today;
-        var to = from.AddDays(8);
+        var from = new DateTime(2025, 6, 2);
+        var to = new DateTime(2025, 6, 10);
 
         // Act
         var r = Reservation.Create(_spot, _user, from, to);

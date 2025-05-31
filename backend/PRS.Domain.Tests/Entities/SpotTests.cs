@@ -168,8 +168,9 @@ namespace PRS.Domain.Tests.Entities
         public async Task ReserveAsync_ExceedsMaxDaysEmployee_Fails()
         {
             var spot = Spot.Create("B02").Value;
-            var from = DateTime.UtcNow.Date;
-            var to = from.AddDays(8);
+
+            var from = new DateTime(2025, 6, 2);
+            var to = new DateTime(2025, 6, 10);
             var spec = new FakeOverlapSpec(allowed: true);
 
             var result = await spot.ReserveAsync(_employee, from, to, spec);
