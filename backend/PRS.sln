@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRS.Application.Tests", "PR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRS.Infrastructure.Tests", "PRS.Infrastructure.Tests\PRS.Infrastructure.Tests.csproj", "{C6EA2AA2-D00A-4CF0-BCB7-2D8E7FDF6619}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRS.Presentation.Tests", "PRS.Presentation.Tests\PRS.Presentation.Tests.csproj", "{AF80EBBC-6BCB-4D32-BC0C-BE997F72826B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,5 +56,9 @@ Global
 		{C6EA2AA2-D00A-4CF0-BCB7-2D8E7FDF6619}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6EA2AA2-D00A-4CF0-BCB7-2D8E7FDF6619}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6EA2AA2-D00A-4CF0-BCB7-2D8E7FDF6619}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF80EBBC-6BCB-4D32-BC0C-BE997F72826B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF80EBBC-6BCB-4D32-BC0C-BE997F72826B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF80EBBC-6BCB-4D32-BC0C-BE997F72826B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF80EBBC-6BCB-4D32-BC0C-BE997F72826B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
